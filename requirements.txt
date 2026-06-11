@@ -1,0 +1,6 @@
+datasets>=2.20
+kaggle>=1.6
+pillow>=10.0
+torch>=2.2
+torchvision>=0.17
+tqdm>=4.66

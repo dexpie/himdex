@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "himdex"
+version = "0.1.0"
+description = "Efficient multimodal starter model for text and image datasets."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [
+  { name = "Gading" }
+]
+keywords = ["machine-learning", "multimodal", "transformer", "pytorch"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence"
+]
+dependencies = [
+  "datasets>=2.20",
+  "kaggle>=1.6",
+  "pillow>=10.0",
+  "torch>=2.2",
+  "torchvision>=0.17",
+  "tqdm>=4.66"
+]
+
+[project.scripts]
+himdex-prepare-data = "himdex.prepare_datasets:main"
+himdex-pretrain-text = "himdex.pretrain_text:main"
+himdex-train = "himdex.train:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

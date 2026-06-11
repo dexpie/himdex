@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Environments
+.venv/
+venv/
+env/
+
+# Local datasets and experiment outputs
+data/
+runs/
+work/
+
+# Large model artifacts are ignored by default.
+# Put intentional small release checkpoints in checkpoints/.
+*.pt
+*.pth
+*.safetensors
+!checkpoints/*.pt
+!checkpoints/*.safetensors
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

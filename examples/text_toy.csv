@@ -1,0 +1,7 @@
+text,label
+"aku suka model ini",positif
+"hasilnya bagus sekali",positif
+"ini membantu pekerjaanku",positif
+"aku tidak suka ini",negatif
+"hasilnya buruk sekali",negatif
+"ini bikin pekerjaanku susah",negatif
