@@ -1,5 +1,6 @@
 {
   "name": "word-char+himdex",
+  "checkpoint": "checkpoints\\himdex_text_base_v2.pt",
   "dataset": "data\\himdex_starter\\prepared\\text_classification\\hf_ag_news.csv",
   "accuracy": 0.9194,
   "train_seconds": 33.53691999998409,

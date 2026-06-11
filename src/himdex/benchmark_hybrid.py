@@ -15,6 +15,7 @@ from .inference import HimdexEncoder
 @dataclass(frozen=True)
 class HybridResult:
     name: str
+    checkpoint: str
     dataset: str
     accuracy: float
     train_seconds: float
@@ -83,6 +84,7 @@ def run_hybrid_benchmark(
 
     return HybridResult(
         name="word-char+himdex",
+        checkpoint=str(checkpoint_path),
         dataset=str(data_path),
         accuracy=float(accuracy_score(validation_labels, predictions)),
         train_seconds=train_seconds,

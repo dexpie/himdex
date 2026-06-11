@@ -19,16 +19,17 @@ masked text modeling, and future multimodal training.
 - Resumable masked-text pretraining from existing checkpoints.
 - Built-in embedding API and CLI for downstream applications.
 
-## Himdex Base v2
+## Himdex Base v3
 
-The current base checkpoint has 11.24M parameters and was trained for 4,000
-masked-byte prediction steps.
+The current base checkpoint has 11.24M parameters and was continued to 6,000
+masked-byte prediction steps from Base v2.
 
 | Benchmark | Validation accuracy |
 | --- | ---: |
-| AG News text classification | 69.24% |
+| AG News pure Himdex best | 69.24% |
+| AG News pure Himdex Base v3 continued | 65.08% |
 | AG News TF-IDF word+char baseline | 91.90% |
-| AG News Himdex hybrid | 91.94% |
+| AG News Himdex hybrid, Base v3 embeddings | 92.00% |
 | Beans image classification | 78.71% |
 
 See [MODEL_CARD.md](MODEL_CARD.md) for configuration, training metrics,
@@ -139,7 +140,7 @@ himdex-pretrain-text --data data\himdex_pack\prepared --epochs 1 --batch-size 8 
 Resume from an existing checkpoint:
 
 ```powershell
-himdex-pretrain-text --data data\himdex_pack\prepared --resume-from checkpoints\himdex_text_base_v2.pt --epochs 1 --batch-size 32 --max-steps 2000
+himdex-pretrain-text --data data\himdex_pack\prepared --resume-from checkpoints\himdex_text_base_v3.pt --epochs 1 --batch-size 32 --max-steps 2000
 ```
 
 ## Generate Embeddings
@@ -149,7 +150,7 @@ Python API:
 ```python
 from himdex import HimdexEncoder
 
-encoder = HimdexEncoder("checkpoints/himdex_text_base_v2.pt")
+encoder = HimdexEncoder("checkpoints/himdex_text_base_v3.pt")
 embeddings = encoder.encode_text(["Himdex is open source."])
 print(embeddings.shape)
 ```
@@ -157,7 +158,7 @@ print(embeddings.shape)
 Command line:
 
 ```powershell
-himdex-embed --checkpoint checkpoints\himdex_text_base_v2.pt --text "Himdex is open source" --output embeddings.pt
+himdex-embed --checkpoint checkpoints\himdex_text_base_v3.pt --text "Himdex is open source" --output embeddings.pt
 ```
 
 ## Text Baselines
@@ -173,7 +174,7 @@ Run the hybrid benchmark that combines TF-IDF word+character features with
 Himdex embeddings:
 
 ```powershell
-himdex-benchmark-hybrid --data data\himdex_pack\prepared\text_classification\hf_ag_news.csv --checkpoint checkpoints\himdex_text_base_v2.pt
+himdex-benchmark-hybrid --data data\himdex_pack\prepared\text_classification\hf_ag_news.csv --checkpoint checkpoints\himdex_text_base_v3.pt
 ```
 
 ## Reference Checkpoint
@@ -181,7 +182,7 @@ himdex-benchmark-hybrid --data data\himdex_pack\prepared\text_classification\hf_
 This repository includes a compact reference checkpoint:
 
 ```text
-checkpoints/himdex_text_base_v2.pt
+checkpoints/himdex_text_base_v3.pt
 ```
 
 It is trained with masked byte prediction and can be used to test loading,

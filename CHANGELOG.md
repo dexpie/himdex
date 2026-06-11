@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.4.0 - 2026-06-11
+
+- Added Himdex Base v3, continued from Base v2 to 6,000 masked-byte
+  pretraining steps.
+- Added Base v3 checkpoint metadata and AG News hybrid benchmark output.
+- Improved the AG News hybrid benchmark from 91.94% to 92.00% validation
+  accuracy when using Base v3 embeddings.
+- Documented that the pure Base v3 AG News classifier improved to 65.08% after
+  continued fine-tuning, but still trails the previous 69.24% pure-neural best.
+
 ## 0.3.0 - 2026-06-11
 
 - Added TF-IDF and Himdex hybrid text benchmark commands.

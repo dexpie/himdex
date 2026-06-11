@@ -1,0 +1,21 @@
+{
+  "dataset": "data\\himdex_starter\\prepared\\text_classification\\hf_ag_news.csv",
+  "validation_ratio": 0.1,
+  "seed": 42,
+  "checkpoint": "runs\\himdex_text_pretrain_v3\\himdex_text_pretrain.pt",
+  "continued_checkpoint": "runs\\himdex_ag_news_v3_continued\\himdex.pt",
+  "results": [
+    {
+      "name": "Himdex Base v3 classifier",
+      "epochs": 3,
+      "validation_loss": 0.9443,
+      "validation_accuracy": 0.6174
+    },
+    {
+      "name": "Himdex Base v3 classifier continued",
+      "additional_epochs": 4,
+      "validation_loss": 0.8646,
+      "validation_accuracy": 0.6508
+    }
+  ]
+}

@@ -29,10 +29,13 @@ Results:
 | TF-IDF character 3-5 gram | 91.46% |
 | TF-IDF word + character | 91.90% |
 | TF-IDF word + character + Himdex Base v2 embedding | 91.94% |
+| TF-IDF word + character + Himdex Base v3 embedding | 92.00% |
+| Himdex Base v3 classifier continued | 65.08% |
 
 Reproduce:
 
 ```powershell
 himdex-benchmark-tfidf --data data\himdex_starter\prepared\text_classification\hf_ag_news.csv --output benchmarks\ag_news_tfidf.json
 himdex-benchmark-hybrid --data data\himdex_starter\prepared\text_classification\hf_ag_news.csv --checkpoint checkpoints\himdex_text_base_v2.pt --output benchmarks\ag_news_hybrid.json
+himdex-benchmark-hybrid --data data\himdex_starter\prepared\text_classification\hf_ag_news.csv --checkpoint checkpoints\himdex_text_base_v3.pt --output benchmarks\ag_news_hybrid_base_v3.json
 ```

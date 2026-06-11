@@ -1,6 +1,6 @@
-# Himdex Base v2 Model Card
+# Himdex Base v3 Model Card
 
-Himdex Base v2 is an 11.24M-parameter multimodal Transformer backbone for text
+Himdex Base v3 is an 11.24M-parameter multimodal Transformer backbone for text
 and image learning. It represents text as UTF-8 byte tokens and images as patch
 tokens processed by a shared encoder.
 
@@ -19,15 +19,18 @@ tokens processed by a shared encoder.
 
 ## Pretraining
 
-Himdex Base v2 was trained with masked byte prediction on the Himdex 5GB
-dataset pipeline using a curated local subset of public text sources.
+Himdex Base v3 was continued from Base v2 with masked byte prediction on the
+Himdex local dataset pipeline.
 
 | Metric | Value |
 | --- | ---: |
-| Optimizer steps | 4,000 |
-| Train loss | 3.1802 |
-| Validation loss | 3.1203 |
-| Masked-byte accuracy | 17.06% |
+| Optimizer steps | 6,000 |
+| Train loss | 3.1412 |
+| Validation loss | 3.1240 |
+| Masked-byte accuracy | 16.94% |
+
+With a fixed evaluation seed on the same held-out split, Base v3 improved
+masked-byte validation loss from 3.1468 to 3.1322 compared with Base v2.
 
 ## Transfer Benchmarks
 
@@ -36,7 +39,8 @@ They are development benchmarks, not official dataset leaderboard submissions.
 
 | Task | Dataset | Validation split | Best accuracy | Best loss |
 | --- | --- | ---: | ---: | ---: |
-| Text classification | AG News | 10% | 69.24% | 0.7788 |
+| Text classification, best pure Himdex | AG News | 10% | 69.24% | 0.7788 |
+| Text classification, Base v3 continued | AG News | 10% | 65.08% | 0.8646 |
 | Image classification | Beans | 15% | 78.71% | 0.5591 |
 
 ## Text Baseline Benchmarks
@@ -50,7 +54,8 @@ train/validation split as the Himdex fine-tuning run.
 | TF-IDF word unigram + bigram | 200,000 | 91.60% |
 | TF-IDF character 3-5 gram | 169,009 | 91.46% |
 | TF-IDF word + character | 369,009 | 91.90% |
-| TF-IDF word + character + Himdex embedding | 369,393 | 91.94% |
+| TF-IDF word + character + Himdex Base v2 embedding | 369,393 | 91.94% |
+| TF-IDF word + character + Himdex Base v3 embedding | 369,393 | 92.00% |
 
 The hybrid result is a small but measurable gain over the strongest TF-IDF
 baseline on this split. It shows that Himdex embeddings add useful signal, while
