@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "himdex"
-version = "0.2.0"
+version = "0.2.1"
 description = "Efficient multimodal Transformer for text and image learning."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -17,7 +17,6 @@ classifiers = [
   "Development Status :: 3 - Alpha",
   "Intended Audience :: Developers",
   "Intended Audience :: Science/Research",
-  "License :: OSI Approved :: MIT License",
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
@@ -36,6 +35,7 @@ data = [
   "kaggle>=1.6"
 ]
 dev = [
+  "build>=1.2",
   "pytest>=8.0"
 ]
 

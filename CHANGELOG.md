@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.1 - 2026-06-11
+
+- Fixed PEP 639 license metadata compatibility with current setuptools.
+- Updated GitHub Actions to Node 24-compatible action versions.
+- Added package build validation to CI.
+
 ## 0.2.0 - 2026-06-11
 
 - Added Himdex Base v2 with 11.24M parameters and a 384-dimensional embedding
