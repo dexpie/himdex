@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "himdex"
 version = "0.1.0"
-description = "Efficient multimodal starter model for text and image datasets."
+description = "Efficient multimodal Transformer for text and image learning."
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }

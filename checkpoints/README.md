@@ -1,6 +1,7 @@
 # Himdex Checkpoints
 
-Small starter checkpoints can live here when they are useful for demos.
+Compact reference checkpoints can live here when they are useful for examples,
+resume training, or downstream experiments.
 
-Large production checkpoints should be published with GitHub Releases, Hugging
-Face Hub, or Git LFS instead of being committed directly to the repository.
+Large checkpoints should be published with GitHub Releases, Hugging Face Hub, or
+Git LFS instead of being committed directly to the repository.

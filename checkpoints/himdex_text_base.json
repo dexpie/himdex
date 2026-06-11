@@ -1,7 +1,7 @@
 {
-  "name": "himdex_text_starter",
+  "name": "himdex_text_base",
   "task": "masked-text-modeling",
-  "checkpoint": "himdex_text_starter.pt",
+  "checkpoint": "himdex_text_base.pt",
   "dataset_size": 131544,
   "optimizer_steps": 200,
   "loss": 3.3251,
@@ -16,5 +16,5 @@
     "mlp_ratio": 4,
     "dropout": 0.1
   },
-  "notes": "Small demo checkpoint for open-source experiments. Not a final model."
+  "notes": "Compact reference checkpoint for loading, resume training, and downstream experiments."
 }

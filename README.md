@@ -1,46 +1,36 @@
 # Himdex
 
-Open-source efficient multimodal starter model for text and image experiments.
+Efficient multimodal Transformer for text and image learning.
 
-Himdex adalah starter model machine learning multimodal: satu backbone Transformer
-ringan yang bisa menerima dataset teks dan gambar.
+Himdex is a compact PyTorch model family built around a shared Transformer
+backbone. Text is encoded as UTF-8 byte tokens, images are encoded as visual
+patch tokens, and task-specific heads can be attached for classification,
+masked text modeling, and future multimodal training.
 
-Target besarnya: model pribadi yang efisien, fleksibel, dan bisa terus ditingkatkan.
-Target realistis MVP ini: bisa dilatih untuk klasifikasi teks dari CSV dan klasifikasi
-gambar dari folder dataset.
+## Highlights
 
-## Kenapa Mulai Dari Sini?
+- Shared Transformer backbone for text and image pipelines.
+- Byte-level tokenizer with no separate tokenizer training step.
+- Patch-based image encoder compatible with the same sequence backbone.
+- Training commands for text classification, image classification, and masked
+  text pretraining.
+- Curated dataset preparation pipeline with a configurable local storage
+  budget.
+- Resumable masked-text pretraining from existing checkpoints.
 
-Tidak ada model yang otomatis paling bagus untuk semua dataset. Dataset gambar,
-teks pendek, teks panjang, data medis, data finansial, dan data noisy semuanya punya
-kebutuhan berbeda. Jadi Himdex dibuat dengan filosofi:
-
-- satu encoder inti yang hemat;
-- adapter input berbeda untuk teks dan gambar;
-- format training sederhana;
-- mudah diganti jadi versi lebih besar;
-- bisa ditambah contrastive learning, pretraining, LoRA, distillation, dan retrieval.
-
-## Arsitektur MVP
+## Architecture
 
 ```text
-Teks UTF-8 -> ByteTokenizer -> token embedding \
-                                                 -> shared Transformer -> classifier
-Gambar     -> image patches  -> patch embedding /
+UTF-8 text -> ByteTokenizer -> token embedding \
+                                                -> shared Transformer -> task head
+Images     -> image patches  -> patch embedding /
 ```
 
-Keuntungan byte tokenizer:
+The byte tokenizer makes Himdex easy to apply across languages and noisy text.
+The patch encoder turns images into token sequences, letting the same backbone
+support visual tasks.
 
-- tidak perlu training tokenizer dulu;
-- bisa membaca banyak bahasa;
-- cocok untuk eksperimen awal.
-
-Keuntungan patch embedding:
-
-- gambar diperlakukan sebagai urutan token;
-- bisa memakai encoder yang sama dengan teks.
-
-## Instalasi
+## Installation
 
 ```powershell
 git clone https://github.com/dexpie/himdex.git
@@ -50,11 +40,9 @@ python -m venv .venv
 pip install -e .
 ```
 
-## Training Teks
+## Text Classification
 
-Buat CSV dengan minimal kolom `text` dan `label`.
-
-Contoh:
+Prepare a CSV with `text` and `label` columns.
 
 ```csv
 text,label
@@ -62,118 +50,98 @@ text,label
 "ini buruk sekali",negatif
 ```
 
-Jalankan:
+Train:
 
 ```powershell
 himdex-train --task text-classification --data data\reviews.csv --epochs 5 --batch-size 16
 ```
 
-Untuk mencoba cepat dengan dataset mini bawaan:
-
-```powershell
-himdex-train --task text-classification --data examples\text_toy.csv --epochs 1 --batch-size 2 --hidden-size 64 --num-layers 1 --max-text-length 32
-```
-
-Kalau nama kolom beda:
+Custom columns:
 
 ```powershell
 himdex-train --task text-classification --data data\reviews.csv --text-column kalimat --label-column kelas
 ```
 
-## Training Gambar
+Quick local run:
 
-Gunakan struktur `ImageFolder`:
+```powershell
+himdex-train --task text-classification --data examples\text_toy.csv --epochs 1 --batch-size 2 --hidden-size 64 --num-layers 1 --max-text-length 32
+```
+
+## Image Classification
+
+Use an `ImageFolder` layout:
 
 ```text
 data/images/
-  kucing/
+  cat/
     a.jpg
     b.jpg
-  anjing/
+  dog/
     c.jpg
     d.jpg
 ```
 
-Jalankan:
+Train:
 
 ```powershell
 himdex-train --task image-classification --data data\images --epochs 5 --batch-size 16
 ```
 
-Checkpoint akan tersimpan sebagai:
+Checkpoints are written to:
 
 ```text
 runs/himdex/himdex.pt
 ```
 
-## Dataset Starter 5GB
+## Dataset Pack
 
-Untuk mulai memakai campuran dataset publik dari GitHub, Hugging Face, torchvision,
-dan Kaggle opsional, lihat:
-
-[DATASETS.md](DATASETS.md)
-
-Perintah ringkas:
+Himdex includes a dataset preparation command for public sources such as GitHub,
+Hugging Face, torchvision, and optional Kaggle datasets.
 
 ```powershell
-himdex-prepare-data --root data\himdex_starter --budget-gb 5
-himdex-pretrain-text --data data\himdex_starter\prepared --epochs 1
+himdex-prepare-data --root data\himdex_pack --budget-gb 5
 ```
 
-## Checkpoint Starter
+See [DATASETS.md](DATASETS.md) for registry details, Kaggle setup, and storage
+budget controls.
 
-Repo ini menyertakan checkpoint demo kecil:
+## Masked Text Pretraining
+
+Run masked byte prediction on prepared text data:
+
+```powershell
+himdex-pretrain-text --data data\himdex_pack\prepared --epochs 1 --batch-size 8 --max-text-length 128
+```
+
+Resume from an existing checkpoint:
+
+```powershell
+himdex-pretrain-text --data data\himdex_pack\prepared --resume-from checkpoints\himdex_text_base.pt --epochs 1 --batch-size 8 --max-steps 200
+```
+
+## Reference Checkpoint
+
+This repository includes a compact reference checkpoint:
 
 ```text
-checkpoints/himdex_text_starter.pt
+checkpoints/himdex_text_base.pt
 ```
 
-Checkpoint ini dilatih dengan masked byte prediction dari dataset starter lokal.
-Ini berguna untuk demo dan eksperimen lanjutan, bukan klaim model final.
+It is trained with masked byte prediction and can be used to test loading,
+resume training, or build downstream experiments.
 
-Lanjutkan training dari checkpoint:
+## Technical Direction
 
-```powershell
-himdex-pretrain-text --data data\himdex_starter\prepared --resume-from checkpoints\himdex_text_starter.pt --epochs 1 --batch-size 8 --max-steps 200
-```
+Himdex is designed to grow through focused, measurable improvements:
 
-## Membuat Himdex Lebih "Peak"
+- stronger text pretraining objectives;
+- masked image modeling and contrastive visual learning;
+- text-image alignment for shared embedding spaces;
+- efficient fine-tuning with LoRA, quantization, pruning, and distillation;
+- automatic dataset inspection and task routing;
+- evaluation across accuracy, latency, memory, robustness, and transfer.
 
-Urutan pengembangan yang paling masuk akal:
+## License
 
-1. **MVP supervised**
-   Latih klasifikasi teks dan gambar seperti starter ini.
-
-2. **Pretraining teks**
-   Tambahkan masked byte prediction atau causal language modeling supaya Himdex
-   punya pemahaman bahasa dasar.
-
-3. **Pretraining gambar**
-   Tambahkan masked image modeling atau self-supervised contrastive learning.
-
-4. **Alignment teks-gambar**
-   Tambahkan contrastive loss seperti CLIP agar teks dan gambar hidup di embedding
-   space yang sama.
-
-5. **Efisiensi**
-   Tambahkan LoRA, quantization, pruning, gradient checkpointing, dan knowledge
-   distillation.
-
-6. **Dataset router**
-   Buat sistem yang otomatis mendeteksi jenis dataset, memilih head, dan menyiapkan
-   preprocessing.
-
-7. **Evaluation suite**
-   Ukur akurasi, latency, ukuran model, VRAM, robustness, dan generalisasi.
-
-## Prinsip Penting
-
-Kalau tujuanmu adalah membuat model yang benar-benar kuat, jangan mulai dari model
-raksasa. Mulai dari model kecil yang bisa:
-
-- dilatih sampai selesai;
-- diuji dengan jelas;
-- dibandingkan dengan baseline;
-- diperbaiki berkali-kali.
-
-Himdex versi awal ini adalah fondasi itu.
+Himdex is released under the MIT License.
