@@ -1,0 +1,20 @@
+{
+  "name": "himdex_text_base_v2",
+  "checkpoint": "himdex_text_base_v2.pt",
+  "parameters": 11241475,
+  "optimizer_steps": 4000,
+  "train_loss": 3.1802,
+  "validation_loss": 3.1203,
+  "masked_accuracy": 0.170556,
+  "config": {
+    "vocab_size": 259,
+    "image_size": 224,
+    "patch_size": 16,
+    "max_text_length": 256,
+    "hidden_size": 384,
+    "num_layers": 6,
+    "num_heads": 6,
+    "mlp_ratio": 4,
+    "dropout": 0.1
+  }
+}

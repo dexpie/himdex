@@ -5,6 +5,7 @@ from .model import (
     HimdexForMaskedTextModeling,
     HimdexForTextClassification,
 )
+from .inference import HimdexEncoder
 from .tokenizer import ByteTokenizer
 
 __all__ = [
@@ -14,4 +15,5 @@ __all__ = [
     "HimdexForImageClassification",
     "HimdexForMaskedTextModeling",
     "HimdexForTextClassification",
+    "HimdexEncoder",
 ]

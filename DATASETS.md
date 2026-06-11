@@ -37,7 +37,7 @@ git clone https://github.com/dexpie/himdex.git
 cd himdex
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
-pip install -e .
+pip install -e ".[data]"
 ```
 
 ## Preview The Plan

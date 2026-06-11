@@ -4,11 +4,11 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "himdex"
-version = "0.1.0"
+version = "0.2.0"
 description = "Efficient multimodal Transformer for text and image learning."
 readme = "README.md"
 requires-python = ">=3.10"
-license = { text = "MIT" }
+license = "MIT"
 authors = [
   { name = "Gading" }
 ]
@@ -24,18 +24,31 @@ classifiers = [
   "Topic :: Scientific/Engineering :: Artificial Intelligence"
 ]
 dependencies = [
-  "datasets>=2.20",
-  "kaggle>=1.6",
   "pillow>=10.0",
   "torch>=2.2",
   "torchvision>=0.17",
   "tqdm>=4.66"
 ]
 
+[project.optional-dependencies]
+data = [
+  "datasets>=2.20",
+  "kaggle>=1.6"
+]
+dev = [
+  "pytest>=8.0"
+]
+
+[project.urls]
+Homepage = "https://github.com/dexpie/himdex"
+Repository = "https://github.com/dexpie/himdex"
+Issues = "https://github.com/dexpie/himdex/issues"
+
 [project.scripts]
 himdex-prepare-data = "himdex.prepare_datasets:main"
 himdex-pretrain-text = "himdex.pretrain_text:main"
 himdex-train = "himdex.train:main"
+himdex-embed = "himdex.inference:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

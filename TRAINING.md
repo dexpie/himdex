@@ -1,6 +1,6 @@
 # Himdex Training Notes
 
-## Masked Text Pretraining
+## Himdex Base v2
 
 The current reference checkpoint uses masked byte prediction on mixed text
 prepared by `himdex-prepare-data`.
@@ -8,27 +8,28 @@ prepared by `himdex-prepare-data`.
 Latest continuation run:
 
 ```text
-source checkpoint: checkpoints/himdex_text_base.pt
-steps: 200
-batch size: 8
-sequence length: 128
-hidden size: 128
-layers: 2
-heads: 4
-loss: 3.3251
-published checkpoint: checkpoints/himdex_text_base.pt
+steps: 4,000
+batch size: 32
+sequence length: 256
+hidden size: 384
+layers: 6
+heads: 6
+train loss: 3.1802
+validation loss: 3.1203
+masked accuracy: 17.06%
+published checkpoint: checkpoints/himdex_text_base_v2.pt
 ```
 
 Recommended local command:
 
 ```powershell
-himdex-pretrain-text --data data\himdex_pack\prepared --epochs 1 --batch-size 8 --hidden-size 128 --num-layers 2 --num-heads 4 --max-text-length 128 --max-steps 250 --output-dir runs\himdex_text_base
+himdex-pretrain-text --data data\himdex_pack\prepared --epochs 2 --batch-size 32 --hidden-size 384 --num-layers 6 --num-heads 6 --max-text-length 256 --max-steps 4000 --output-dir runs\himdex_text_base_v2
 ```
 
 Continue from a checkpoint:
 
 ```powershell
-himdex-pretrain-text --data data\himdex_pack\prepared --resume-from checkpoints\himdex_text_base.pt --epochs 1 --batch-size 8 --max-steps 200 --output-dir runs\himdex_text_base_v2
+himdex-pretrain-text --data data\himdex_pack\prepared --resume-from checkpoints\himdex_text_base_v2.pt --epochs 1 --batch-size 32 --max-steps 2000 --output-dir runs\himdex_text_base_v2_continued
 ```
 
 For open-source releases, keep raw datasets out of git. Commit code, configs,

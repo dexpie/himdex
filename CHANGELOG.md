@@ -1,0 +1,20 @@
+# Changelog
+
+## 0.2.0 - 2026-06-11
+
+- Added Himdex Base v2 with 11.24M parameters and a 384-dimensional embedding
+  space.
+- Added mixed-precision pretraining, validation metrics, gradient clipping,
+  cosine learning-rate scheduling, atomic checkpoints, and optimizer resume.
+- Added resumable text and image classification fine-tuning with best-checkpoint
+  selection.
+- Added `HimdexEncoder` and the `himdex-embed` command for text and image
+  embeddings.
+- Added a model card with AG News and Beans transfer benchmarks.
+- Added GitHub Actions CI and optional dependency groups.
+- Renamed public dataset paths and checkpoint variants for clearer packaging.
+
+## 0.1.0 - 2026-06-11
+
+- Initial open-source release with shared text/image Transformer backbone,
+  dataset preparation, masked-text pretraining, and classification commands.

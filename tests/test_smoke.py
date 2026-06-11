@@ -1,7 +1,10 @@
+from pathlib import Path
+
 import torch
 
 from himdex import (
     ByteTokenizer,
+    HimdexEncoder,
     HimdexConfig,
     HimdexForImageClassification,
     HimdexForMaskedTextModeling,
@@ -39,3 +42,13 @@ def test_masked_text_forward_shape():
     logits = model(encoded.input_ids.unsqueeze(0), encoded.attention_mask.unsqueeze(0))
 
     assert logits.shape == (1, 32, tokenizer.vocab_size)
+
+
+def test_reference_checkpoint_embedding():
+    checkpoint = Path(__file__).parents[1] / "checkpoints" / "himdex_text_compact.pt"
+    encoder = HimdexEncoder(checkpoint, device="cpu")
+
+    embeddings = encoder.encode_text(["himdex"])
+
+    assert embeddings.shape == (1, 128)
+    assert torch.allclose(embeddings.norm(dim=-1), torch.ones(1), atol=1e-5)

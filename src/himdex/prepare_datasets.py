@@ -11,12 +11,12 @@ from typing import Iterable
 
 from tqdm import tqdm
 
-from .dataset_registry import DATASET_REGISTRY, DatasetSpec, default_starter_ids, registry_by_id
+from .dataset_registry import DATASET_REGISTRY, DatasetSpec, default_dataset_ids, registry_by_id
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Prepare curated starter datasets for Himdex.")
-    parser.add_argument("--root", default="data/himdex_starter", help="Output dataset root.")
+    parser = argparse.ArgumentParser(description="Prepare curated datasets for Himdex.")
+    parser.add_argument("--root", default="data/himdex_pack", help="Output dataset root.")
     parser.add_argument("--budget-gb", type=float, default=5.0, help="Hard local storage budget.")
     parser.add_argument(
         "--include-sources",
@@ -25,7 +25,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--dataset-ids",
-        default=",".join(default_starter_ids()),
+        default=",".join(default_dataset_ids()),
         help="Comma-separated registry ids. Use 'all' for every known registry item.",
     )
     parser.add_argument("--rows-per-text-dataset", type=int, default=50000)

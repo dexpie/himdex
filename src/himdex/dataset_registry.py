@@ -163,7 +163,7 @@ def registry_by_id() -> dict[str, DatasetSpec]:
     return {spec.id: spec for spec in DATASET_REGISTRY}
 
 
-def default_starter_ids() -> list[str]:
+def default_dataset_ids() -> list[str]:
     return [
         "github_tiny_shakespeare",
         "hf_ag_news",

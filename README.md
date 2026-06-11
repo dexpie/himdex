@@ -17,6 +17,20 @@ masked text modeling, and future multimodal training.
 - Curated dataset preparation pipeline with a configurable local storage
   budget.
 - Resumable masked-text pretraining from existing checkpoints.
+- Built-in embedding API and CLI for downstream applications.
+
+## Himdex Base v2
+
+The current base checkpoint has 11.24M parameters and was trained for 4,000
+masked-byte prediction steps.
+
+| Benchmark | Validation accuracy |
+| --- | ---: |
+| AG News text classification | 69.24% |
+| Beans image classification | 78.71% |
+
+See [MODEL_CARD.md](MODEL_CARD.md) for configuration, training metrics,
+limitations, and evaluation details.
 
 ## Architecture
 
@@ -38,6 +52,12 @@ cd himdex
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -e .
+```
+
+Install dataset connectors when needed:
+
+```powershell
+pip install -e ".[data]"
 ```
 
 ## Text Classification
@@ -117,7 +137,25 @@ himdex-pretrain-text --data data\himdex_pack\prepared --epochs 1 --batch-size 8 
 Resume from an existing checkpoint:
 
 ```powershell
-himdex-pretrain-text --data data\himdex_pack\prepared --resume-from checkpoints\himdex_text_base.pt --epochs 1 --batch-size 8 --max-steps 200
+himdex-pretrain-text --data data\himdex_pack\prepared --resume-from checkpoints\himdex_text_base_v2.pt --epochs 1 --batch-size 32 --max-steps 2000
+```
+
+## Generate Embeddings
+
+Python API:
+
+```python
+from himdex import HimdexEncoder
+
+encoder = HimdexEncoder("checkpoints/himdex_text_base_v2.pt")
+embeddings = encoder.encode_text(["Himdex is open source."])
+print(embeddings.shape)
+```
+
+Command line:
+
+```powershell
+himdex-embed --checkpoint checkpoints\himdex_text_base_v2.pt --text "Himdex is open source" --output embeddings.pt
 ```
 
 ## Reference Checkpoint
@@ -125,7 +163,7 @@ himdex-pretrain-text --data data\himdex_pack\prepared --resume-from checkpoints\
 This repository includes a compact reference checkpoint:
 
 ```text
-checkpoints/himdex_text_base.pt
+checkpoints/himdex_text_base_v2.pt
 ```
 
 It is trained with masked byte prediction and can be used to test loading,
