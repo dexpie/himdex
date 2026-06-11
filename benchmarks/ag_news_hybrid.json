@@ -1,0 +1,15 @@
+{
+  "name": "word-char+himdex",
+  "dataset": "data\\himdex_starter\\prepared\\text_classification\\hf_ag_news.csv",
+  "accuracy": 0.9194,
+  "train_seconds": 33.53691999998409,
+  "predict_seconds": 0.03931249998277053,
+  "embedding_seconds": 75.86252919997787,
+  "features": 369393,
+  "max_features_per_vectorizer": 200000,
+  "embedding_weight": 1.0,
+  "validation_ratio": 0.1,
+  "seed": 42,
+  "train_samples": 45000,
+  "validation_samples": 5000
+}

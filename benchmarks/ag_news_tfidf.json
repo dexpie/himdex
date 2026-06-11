@@ -1,0 +1,44 @@
+{
+  "dataset": "data\\himdex_starter\\prepared\\text_classification\\hf_ag_news.csv",
+  "validation_ratio": 0.1,
+  "seed": 42,
+  "max_features_per_vectorizer": 200000,
+  "results": [
+    {
+      "name": "word-unigram",
+      "accuracy": 0.9056,
+      "train_seconds": 5.029824499972165,
+      "predict_seconds": 0.10977809998439625,
+      "features": 27548,
+      "train_samples": 45000,
+      "validation_samples": 5000
+    },
+    {
+      "name": "word-unigram-bigram",
+      "accuracy": 0.916,
+      "train_seconds": 10.517972100002225,
+      "predict_seconds": 0.35621910000918433,
+      "features": 200000,
+      "train_samples": 45000,
+      "validation_samples": 5000
+    },
+    {
+      "name": "char-3-5",
+      "accuracy": 0.9146,
+      "train_seconds": 27.88440709997667,
+      "predict_seconds": 1.6958647999563254,
+      "features": 169009,
+      "train_samples": 45000,
+      "validation_samples": 5000
+    },
+    {
+      "name": "word-char",
+      "accuracy": 0.919,
+      "train_seconds": 34.75747660000343,
+      "predict_seconds": 1.4827315000002272,
+      "features": 369009,
+      "train_samples": 45000,
+      "validation_samples": 5000
+    }
+  ]
+}

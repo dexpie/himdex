@@ -2,6 +2,8 @@ from pathlib import Path
 
 import torch
 
+from himdex.benchmark_tfidf import himdex_split_indices, run_benchmark
+
 from himdex import (
     ByteTokenizer,
     HimdexEncoder,
@@ -52,3 +54,45 @@ def test_reference_checkpoint_embedding():
 
     assert embeddings.shape == (1, 128)
     assert torch.allclose(embeddings.norm(dim=-1), torch.ones(1), atol=1e-5)
+
+
+def test_tfidf_benchmark_runs_on_toy_data(tmp_path):
+    data_path = tmp_path / "toy.csv"
+    data_path.write_text(
+        "text,label\n"
+        "great product,positive\n"
+        "excellent service,positive\n"
+        "really good,positive\n"
+        "bad product,negative\n"
+        "awful service,negative\n"
+        "really bad,negative\n",
+        encoding="utf-8",
+    )
+
+    results = run_benchmark(
+        data_path,
+        ["word-unigram"],
+        validation_ratio=0.33,
+        max_features=100,
+    )
+
+    assert len(results) == 1
+    assert 0.0 <= results[0].accuracy <= 1.0
+
+
+def test_himdex_split_is_deterministic():
+    first = himdex_split_indices(100, validation_ratio=0.1, seed=42)
+    second = himdex_split_indices(100, validation_ratio=0.1, seed=42)
+
+    assert first == second
+    assert len(first[0]) == 90
+    assert len(first[1]) == 10
+
+
+def test_encoder_batches_text():
+    checkpoint = Path(__file__).parents[1] / "checkpoints" / "himdex_text_compact.pt"
+    encoder = HimdexEncoder(checkpoint, device="cpu")
+
+    embeddings = encoder.encode_text(["a", "b", "c"], batch_size=2)
+
+    assert embeddings.shape == (3, 128)

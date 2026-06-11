@@ -34,3 +34,17 @@ himdex-pretrain-text --data data\himdex_pack\prepared --resume-from checkpoints\
 
 For open-source releases, keep raw datasets out of git. Commit code, configs,
 docs, and compact reference checkpoints only.
+
+## Baseline Tracking
+
+The current AG News target to beat is the word+character TF-IDF baseline:
+
+```text
+TF-IDF word+character: 91.90%
+Himdex hybrid: 91.94%
+Pure Himdex Base v2 classifier: 69.24%
+```
+
+The next pure-neural training target is to reduce this gap with stronger
+pretraining, subword/character-aware text encoders, and distillation from the
+hybrid classifier.

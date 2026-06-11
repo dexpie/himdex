@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.0 - 2026-06-11
+
+- Added TF-IDF and Himdex hybrid text benchmark commands.
+- Added AG News sparse baseline results and a hybrid benchmark that reaches
+  91.94% validation accuracy on the Himdex split.
+- Added batched text/image embedding inference for safer local GPU usage.
+
 ## 0.2.1 - 2026-06-11
 
 - Fixed PEP 639 license metadata compatibility with current setuptools.

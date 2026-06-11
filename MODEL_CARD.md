@@ -39,6 +39,24 @@ They are development benchmarks, not official dataset leaderboard submissions.
 | Text classification | AG News | 10% | 69.24% | 0.7788 |
 | Image classification | Beans | 15% | 78.71% | 0.5591 |
 
+## Text Baseline Benchmarks
+
+All AG News text benchmarks below use the same deterministic 45,000/5,000
+train/validation split as the Himdex fine-tuning run.
+
+| Model | Features | Validation accuracy |
+| --- | ---: | ---: |
+| TF-IDF word unigram | 27,548 | 90.56% |
+| TF-IDF word unigram + bigram | 200,000 | 91.60% |
+| TF-IDF character 3-5 gram | 169,009 | 91.46% |
+| TF-IDF word + character | 369,009 | 91.90% |
+| TF-IDF word + character + Himdex embedding | 369,393 | 91.94% |
+
+The hybrid result is a small but measurable gain over the strongest TF-IDF
+baseline on this split. It shows that Himdex embeddings add useful signal, while
+also making the next research target clear: close the gap between the pure
+neural model and the hybrid/classical baselines.
+
 ## Intended Use
 
 - text and image representation learning;
@@ -53,6 +71,8 @@ They are development benchmarks, not official dataset leaderboard submissions.
   foundation models.
 - Text uses byte-level tokenization, which is robust across languages but less
   sequence-efficient than a trained subword tokenizer.
+- Pure Himdex text classification currently trails strong sparse TF-IDF
+  baselines on AG News.
 - Text-image alignment has not yet been contrastively trained.
 - Reported metrics come from local validation splits and should not be compared
   directly with official test-set leaderboards.

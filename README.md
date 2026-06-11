@@ -27,6 +27,8 @@ masked-byte prediction steps.
 | Benchmark | Validation accuracy |
 | --- | ---: |
 | AG News text classification | 69.24% |
+| AG News TF-IDF word+char baseline | 91.90% |
+| AG News Himdex hybrid | 91.94% |
 | Beans image classification | 78.71% |
 
 See [MODEL_CARD.md](MODEL_CARD.md) for configuration, training metrics,
@@ -158,6 +160,22 @@ Command line:
 himdex-embed --checkpoint checkpoints\himdex_text_base_v2.pt --text "Himdex is open source" --output embeddings.pt
 ```
 
+## Text Baselines
+
+Run TF-IDF baselines on the same deterministic split used by `himdex-train`:
+
+```powershell
+pip install -e ".[benchmark]"
+himdex-benchmark-tfidf --data data\himdex_pack\prepared\text_classification\hf_ag_news.csv
+```
+
+Run the hybrid benchmark that combines TF-IDF word+character features with
+Himdex embeddings:
+
+```powershell
+himdex-benchmark-hybrid --data data\himdex_pack\prepared\text_classification\hf_ag_news.csv --checkpoint checkpoints\himdex_text_base_v2.pt
+```
+
 ## Reference Checkpoint
 
 This repository includes a compact reference checkpoint:
@@ -174,6 +192,8 @@ resume training, or build downstream experiments.
 Himdex is designed to grow through focused, measurable improvements:
 
 - stronger text pretraining objectives;
+- hybrid neural/sparse text models;
+- subword and character-aware text encoders;
 - masked image modeling and contrastive visual learning;
 - text-image alignment for shared embedding spaces;
 - efficient fine-tuning with LoRA, quantization, pruning, and distillation;
