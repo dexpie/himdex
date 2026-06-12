@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.7.0 - 2026-06-12
+
+- Added `himdex-distill-text` for distilling a packaged Himdex Hybrid teacher
+  into a pure neural text classifier.
+- Added label-order handling for distillation resume runs so teacher logits are
+  aligned with the student classifier head.
+- Recorded the first pure neural distillation run. Distillation plus hard-label
+  polish improved the Base v3 pure path to 67.60% validation accuracy, up from
+  66.98%, while still trailing the 69.24% pure Himdex best.
+
 ## 0.6.0 - 2026-06-12
 
 - Added pure neural text pooling modes for `himdex-train`: `cls`, `mean`, and

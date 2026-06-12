@@ -1,0 +1,21 @@
+{
+  "name": "Himdex Base v3 pure distilled classifier",
+  "dataset": "data\\himdex_starter\\prepared\\text_classification\\hf_ag_news.csv",
+  "teacher": "checkpoints\\himdex_hybrid_ag_news_base_v3.joblib",
+  "base_checkpoint": "checkpoints\\himdex_text_base_v3.pt",
+  "student_start": "runs\\himdex_ag_news_pure_cls_mean_continued\\himdex.pt",
+  "validation_ratio": 0.1,
+  "seed": 42,
+  "text_pooling": "cls-mean",
+  "temperature": 2.0,
+  "alpha": 0.2,
+  "distillation_epochs": 3,
+  "polish_epochs": 3,
+  "best_distilled_validation_accuracy": 0.6742,
+  "best_polished_validation_accuracy": 0.676,
+  "comparison": {
+    "base_v3_pure_cls_mean": 0.6698,
+    "best_pure_himdex": 0.6924,
+    "himdex_hybrid_base_v3": 0.92
+  }
+}

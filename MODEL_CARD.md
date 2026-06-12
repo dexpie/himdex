@@ -40,6 +40,7 @@ They are development benchmarks, not official dataset leaderboard submissions.
 | Task | Dataset | Validation split | Best accuracy | Best loss |
 | --- | --- | ---: | ---: | ---: |
 | Text classification, best pure Himdex | AG News | 10% | 69.24% | 0.7788 |
+| Text classification, Base v3 distilled + polished | AG News | 10% | 67.60% | 0.8238 |
 | Text classification, Base v3 cls-mean | AG News | 10% | 66.98% | 0.8305 |
 | Text classification, Base v3 continued | AG News | 10% | 65.08% | 0.8646 |
 | Image classification | Beans | 15% | 78.71% | 0.5591 |

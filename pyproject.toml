@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "himdex"
-version = "0.6.0"
+version = "0.7.0"
 description = "Efficient multimodal Transformer for text and image learning."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -60,6 +60,7 @@ himdex-embed = "himdex.inference:main"
 himdex-benchmark-tfidf = "himdex.benchmark_tfidf:main"
 himdex-benchmark-hybrid = "himdex.benchmark_hybrid:main"
 himdex-hybrid = "himdex.hybrid_model:main"
+himdex-distill-text = "himdex.distill_text:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

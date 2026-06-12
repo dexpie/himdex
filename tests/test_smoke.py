@@ -3,6 +3,7 @@ from pathlib import Path
 import torch
 
 from himdex.benchmark_tfidf import himdex_split_indices, run_benchmark
+from himdex.distill_text import DistillationTextDataset
 from himdex.hybrid_model import predict_texts, train_hybrid_model
 
 from himdex import (
@@ -151,3 +152,27 @@ def test_hybrid_model_trains_and_predicts_on_toy_data(tmp_path):
     assert model_path.exists()
     assert 0.0 <= metrics.accuracy <= 1.0
     assert len(predictions) == 2
+
+
+def test_distillation_dataset_aligns_teacher_scores(tmp_path):
+    data_path = tmp_path / "toy.csv"
+    data_path.write_text(
+        "text,label\n"
+        "space rocket,space\n"
+        "team goal,sports\n",
+        encoding="utf-8",
+    )
+    tokenizer = ByteTokenizer()
+    teacher_scores = torch.tensor([[2.0, -1.0], [-1.0, 2.0]])
+
+    dataset = DistillationTextDataset(
+        data_path,
+        tokenizer,
+        max_length=16,
+        label_order=["space", "sports"],
+        teacher_scores=teacher_scores,
+    )
+
+    item = dataset[0]
+    assert item["label"].item() == 0
+    assert torch.equal(item["teacher_scores"], teacher_scores[0])

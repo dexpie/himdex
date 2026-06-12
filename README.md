@@ -27,6 +27,7 @@ masked-byte prediction steps from Base v2.
 | Benchmark | Validation accuracy |
 | --- | ---: |
 | AG News pure Himdex best | 69.24% |
+| AG News pure Himdex Base v3 distilled + polished | 67.60% |
 | AG News pure Himdex Base v3 cls-mean | 66.98% |
 | AG News pure Himdex Base v3 continued | 65.08% |
 | AG News TF-IDF word+char baseline | 91.90% |
@@ -195,6 +196,12 @@ Train and run a persisted Himdex Hybrid text classifier:
 ```powershell
 himdex-hybrid train --data data\himdex_pack\prepared\text_classification\hf_ag_news.csv --checkpoint checkpoints\himdex_text_base_v3.pt --output checkpoints\himdex_hybrid_ag_news_base_v3.joblib
 himdex-hybrid predict --model checkpoints\himdex_hybrid_ag_news_base_v3.joblib --checkpoint checkpoints\himdex_text_base_v3.pt --text "NASA launches a new satellite"
+```
+
+Distill the hybrid teacher into a pure neural classifier:
+
+```powershell
+himdex-distill-text --data data\himdex_pack\prepared\text_classification\hf_ag_news.csv --teacher checkpoints\himdex_hybrid_ag_news_base_v3.joblib --backbone-from checkpoints\himdex_text_base_v3.pt --resume-from runs\himdex_ag_news_pure_cls_mean_continued\himdex.pt
 ```
 
 ## Reference Checkpoint
