@@ -4,7 +4,7 @@ import torch
 
 from himdex.benchmark_tfidf import himdex_split_indices, run_benchmark
 from himdex.checkpoint_tools import average_state_dicts
-from himdex.distill_text import DistillationTextDataset, resolve_alpha
+from himdex.distill_text import DistillationTextDataset, resolve_alpha, run_epoch as run_distillation_epoch
 from himdex.evaluate import evaluate_checkpoint
 from himdex.hybrid_model import predict_texts, train_hybrid_model
 from himdex.search_hybrid import parse_float_list, parse_int_list, parse_ngram_ranges
@@ -187,6 +187,45 @@ def test_distillation_alpha_schedule_interpolates():
     assert resolve_alpha(1, 3, alpha=0.5, alpha_start=0.1, alpha_end=0.3) == 0.1
     assert resolve_alpha(2, 3, alpha=0.5, alpha_start=0.1, alpha_end=0.3) == 0.2
     assert resolve_alpha(3, 3, alpha=0.5, alpha_start=0.1, alpha_end=0.3) == 0.3
+
+
+def test_distillation_epoch_supports_frozen_backbone(tmp_path):
+    data_path = tmp_path / "toy.csv"
+    data_path.write_text(
+        "text,label\n"
+        "space rocket,space\n"
+        "team goal,sports\n",
+        encoding="utf-8",
+    )
+    tokenizer = ByteTokenizer()
+    teacher_scores = torch.tensor([[2.0, -1.0], [-1.0, 2.0]])
+    dataset = DistillationTextDataset(
+        data_path,
+        tokenizer,
+        max_length=16,
+        label_order=["space", "sports"],
+        teacher_scores=teacher_scores,
+    )
+    loader = torch.utils.data.DataLoader(dataset, batch_size=2)
+    config = HimdexConfig(max_text_length=16, hidden_size=32, num_layers=1, num_heads=4)
+    model = HimdexForTextClassification(config, num_labels=2)
+    freeze_backbone_parameters(model)
+    optimizer = build_optimizer(model, lr=1e-3, weight_decay=0.0)
+
+    loss, accuracy = run_distillation_epoch(
+        model,
+        loader,
+        torch.device("cpu"),
+        temperature=2.0,
+        alpha=0.1,
+        optimizer=optimizer,
+        grad_accum_steps=2,
+        freeze_backbone=True,
+    )
+
+    assert loss > 0.0
+    assert 0.0 <= accuracy <= 1.0
+    assert not any(parameter.requires_grad for parameter in model.backbone.parameters())
 
 
 def test_average_state_dicts_blends_float_tensors():

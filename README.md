@@ -234,6 +234,13 @@ Distill the hybrid teacher into a pure neural classifier:
 himdex-distill-text --data data\himdex_pack\prepared\text_classification\hf_ag_news.csv --teacher checkpoints\himdex_hybrid_ag_news_search_v1.joblib --backbone-from checkpoints\himdex_text_base_v3.pt --resume-from checkpoints\himdex_ag_news_pure_avg_v3.pt --teacher-cache work\ag_news_search_v1_teacher_scores.joblib --backbone-lr 5e-6 --head-lr 5e-5 --alpha-start 0.02 --alpha-end 0.06
 ```
 
+Run low-VRAM head-only distillation when you want to tune only the classifier
+head against the hybrid teacher:
+
+```powershell
+himdex-distill-text --data data\himdex_pack\prepared\text_classification\hf_ag_news.csv --teacher checkpoints\himdex_hybrid_ag_news_search_v1.joblib --backbone-from checkpoints\himdex_text_base_v3.pt --resume-from checkpoints\himdex_ag_news_pure_avg_v3.pt --teacher-cache work\ag_news_search_v1_teacher_scores.joblib --freeze-backbone --lr 1e-4 --alpha-start 0.01 --alpha-end 0.04
+```
+
 Average compatible pure checkpoints:
 
 ```powershell

@@ -16,7 +16,7 @@ from .hybrid_model import _require_hybrid_dependencies
 from .inference import HimdexEncoder
 from .model import HimdexConfig, HimdexForTextClassification
 from .tokenizer import ByteTokenizer
-from .train import build_optimizer
+from .train import build_optimizer, freeze_backbone_parameters
 
 
 class DistillationTextDataset(Dataset):
@@ -202,11 +202,14 @@ def run_epoch(
     optimizer: torch.optim.Optimizer | None = None,
     grad_clip: float = 1.0,
     grad_accum_steps: int = 1,
+    freeze_backbone: bool = False,
 ) -> tuple[float, float]:
     if grad_accum_steps < 1:
         raise ValueError("grad_accum_steps must be at least 1")
     training = optimizer is not None
     model.train(training)
+    if training and freeze_backbone:
+        model.backbone.eval()
     total_loss = 0.0
     correct = 0
     total = 0
@@ -280,6 +283,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--text-pooling", choices=["cls", "mean", "cls-mean"], default="cls-mean")
     parser.add_argument("--text-column", default="text")
     parser.add_argument("--label-column", default="label")
+    parser.add_argument("--freeze-backbone", action="store_true", help="Train only the classifier head.")
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
     return parser.parse_args()
@@ -362,6 +366,12 @@ def main() -> None:
         print(f"resumed {args.resume_from}")
     else:
         load_backbone(model, args.backbone_from)
+    trainable_parameters = sum(parameter.numel() for parameter in model.parameters())
+    if args.freeze_backbone:
+        trainable_parameters = freeze_backbone_parameters(model)
+        print(f"froze backbone; trainable_parameters={trainable_parameters}")
+    if trainable_parameters == 0:
+        raise ValueError("No trainable parameters available")
     model.to(device)
     optimizer = build_optimizer(
         model=model,
@@ -400,6 +410,7 @@ def main() -> None:
             optimizer,
             args.grad_clip,
             args.grad_accum_steps,
+            freeze_backbone=args.freeze_backbone,
         )
         validation_loss, validation_accuracy = run_epoch(
             model,
@@ -441,6 +452,8 @@ def main() -> None:
                     "optimizer_lrs": [group["lr"] for group in optimizer.param_groups],
                     "grad_accum_steps": args.grad_accum_steps,
                     "effective_batch_size": args.batch_size * args.grad_accum_steps,
+                    "freeze_backbone": args.freeze_backbone,
+                    "trainable_parameters": trainable_parameters,
                     "model_state": model.state_dict(),
                 },
                 output_dir / "himdex.pt",

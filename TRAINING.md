@@ -90,6 +90,12 @@ The direct distillation checkpoint reached 69.14%, but averaging it into
 `himdex_ag_news_pure_avg_v2.pt` at weight 0.10 produced
 `himdex_ag_news_pure_avg_v3.pt` at 69.68%.
 
+Latest head-only distillation tests from `himdex_ag_news_pure_avg_v3.pt`
+trained only 1,540 classifier-head parameters. A stronger head-only run reached
+69.38%, and a softer run reached 69.42%. Small checkpoint-soup sweeps did not
+beat 69.68%, so `himdex_ag_news_pure_avg_v3.pt` remains the released pure
+checkpoint.
+
 The next pure-neural training target is to reduce this gap with stronger
 pretraining, subword/character-aware text encoders, better pooling, and
 distillation from the hybrid classifier.

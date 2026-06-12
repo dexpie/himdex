@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.16.0 - 2026-06-12
+
+- Added `--freeze-backbone` to `himdex-distill-text` for low-VRAM,
+  classifier-head-only distillation from a hybrid teacher.
+- Kept frozen backbones in eval mode during distillation so head-only runs use
+  stable representations.
+- Stored `freeze_backbone` and `trainable_parameters` metadata in distillation
+  checkpoints.
+- Added smoke coverage for frozen-backbone distillation with gradient
+  accumulation.
+- Tested two searched-teacher head-only distillation runs from
+  `himdex_ag_news_pure_avg_v3.pt`; neither beat the 69.68% released pure
+  checkpoint, so no weaker model was promoted.
+
 ## 0.15.0 - 2026-06-12
 
 - Added cached teacher-score support to `himdex-distill-text`, avoiding repeat
