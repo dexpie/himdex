@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.5.0 - 2026-06-12
+
+- Added `himdex-hybrid`, a train/predict CLI for persisted Himdex hybrid text
+  classifiers.
+- Added the `himdex_hybrid_ag_news_base_v3.joblib` reference artifact.
+- Promoted Himdex Hybrid AG News as the strongest packaged text model so far,
+  reaching 92.00% validation accuracy and beating the 91.90% TF-IDF word+char
+  baseline on the same split.
+
 ## 0.4.0 - 2026-06-11
 
 - Added Himdex Base v3, continued from Base v2 to 6,000 masked-byte

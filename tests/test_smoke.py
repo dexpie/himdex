@@ -3,6 +3,7 @@ from pathlib import Path
 import torch
 
 from himdex.benchmark_tfidf import himdex_split_indices, run_benchmark
+from himdex.hybrid_model import predict_texts, train_hybrid_model
 
 from himdex import (
     ByteTokenizer,
@@ -96,3 +97,40 @@ def test_encoder_batches_text():
     embeddings = encoder.encode_text(["a", "b", "c"], batch_size=2)
 
     assert embeddings.shape == (3, 128)
+
+
+def test_hybrid_model_trains_and_predicts_on_toy_data(tmp_path):
+    data_path = tmp_path / "toy.csv"
+    model_path = tmp_path / "hybrid.joblib"
+    checkpoint = Path(__file__).parents[1] / "checkpoints" / "himdex_text_compact.pt"
+    data_path.write_text(
+        "text,label\n"
+        "space rocket launches,space\n"
+        "orbit satellite mission,space\n"
+        "team wins match,sports\n"
+        "coach scores goal,sports\n"
+        "new rocket orbit,space\n"
+        "team match goal,sports\n",
+        encoding="utf-8",
+    )
+
+    metrics = train_hybrid_model(
+        data_path,
+        checkpoint,
+        model_path,
+        validation_ratio=0.33,
+        max_features=100,
+        batch_size=2,
+        device="cpu",
+    )
+    predictions = predict_texts(
+        model_path,
+        ["rocket mission", "team goal"],
+        checkpoint_path=checkpoint,
+        batch_size=2,
+        device="cpu",
+    )
+
+    assert model_path.exists()
+    assert 0.0 <= metrics.accuracy <= 1.0
+    assert len(predictions) == 2

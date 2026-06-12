@@ -29,7 +29,7 @@ masked-byte prediction steps from Base v2.
 | AG News pure Himdex best | 69.24% |
 | AG News pure Himdex Base v3 continued | 65.08% |
 | AG News TF-IDF word+char baseline | 91.90% |
-| AG News Himdex hybrid, Base v3 embeddings | 92.00% |
+| AG News Himdex Hybrid packaged model | 92.00% |
 | Beans image classification | 78.71% |
 
 See [MODEL_CARD.md](MODEL_CARD.md) for configuration, training metrics,
@@ -61,6 +61,12 @@ Install dataset connectors when needed:
 
 ```powershell
 pip install -e ".[data]"
+```
+
+Install benchmark and hybrid-model dependencies when needed:
+
+```powershell
+pip install -e ".[benchmark]"
 ```
 
 ## Text Classification
@@ -177,12 +183,20 @@ Himdex embeddings:
 himdex-benchmark-hybrid --data data\himdex_pack\prepared\text_classification\hf_ag_news.csv --checkpoint checkpoints\himdex_text_base_v3.pt
 ```
 
+Train and run a persisted Himdex Hybrid text classifier:
+
+```powershell
+himdex-hybrid train --data data\himdex_pack\prepared\text_classification\hf_ag_news.csv --checkpoint checkpoints\himdex_text_base_v3.pt --output checkpoints\himdex_hybrid_ag_news_base_v3.joblib
+himdex-hybrid predict --model checkpoints\himdex_hybrid_ag_news_base_v3.joblib --checkpoint checkpoints\himdex_text_base_v3.pt --text "NASA launches a new satellite"
+```
+
 ## Reference Checkpoint
 
 This repository includes a compact reference checkpoint:
 
 ```text
 checkpoints/himdex_text_base_v3.pt
+checkpoints/himdex_hybrid_ag_news_base_v3.joblib
 ```
 
 It is trained with masked byte prediction and can be used to test loading,

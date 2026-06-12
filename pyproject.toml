@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "himdex"
-version = "0.4.0"
+version = "0.5.0"
 description = "Efficient multimodal Transformer for text and image learning."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -35,11 +35,15 @@ data = [
   "kaggle>=1.6"
 ]
 benchmark = [
+  "joblib>=1.3",
+  "scipy>=1.10",
   "scikit-learn>=1.4"
 ]
 dev = [
   "build>=1.2",
+  "joblib>=1.3",
   "pytest>=8.0",
+  "scipy>=1.10",
   "scikit-learn>=1.4"
 ]
 
@@ -55,6 +59,7 @@ himdex-train = "himdex.train:main"
 himdex-embed = "himdex.inference:main"
 himdex-benchmark-tfidf = "himdex.benchmark_tfidf:main"
 himdex-benchmark-hybrid = "himdex.benchmark_hybrid:main"
+himdex-hybrid = "himdex.hybrid_model:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

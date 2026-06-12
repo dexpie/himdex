@@ -1,0 +1,17 @@
+{
+  "name": "himdex_hybrid_ag_news_base_v3",
+  "artifact": "himdex_hybrid_ag_news_base_v3.joblib",
+  "format": "himdex-hybrid-text-classifier-v1",
+  "base_checkpoint": "himdex_text_base_v3.pt",
+  "dataset": "data/himdex_starter/prepared/text_classification/hf_ag_news.csv",
+  "validation_ratio": 0.1,
+  "seed": 42,
+  "train_samples": 45000,
+  "validation_samples": 5000,
+  "features": 369393,
+  "accuracy": 0.92,
+  "baseline_to_beat": {
+    "name": "TF-IDF word + character",
+    "accuracy": 0.919
+  }
+}

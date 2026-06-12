@@ -38,4 +38,5 @@ Reproduce:
 himdex-benchmark-tfidf --data data\himdex_starter\prepared\text_classification\hf_ag_news.csv --output benchmarks\ag_news_tfidf.json
 himdex-benchmark-hybrid --data data\himdex_starter\prepared\text_classification\hf_ag_news.csv --checkpoint checkpoints\himdex_text_base_v2.pt --output benchmarks\ag_news_hybrid.json
 himdex-benchmark-hybrid --data data\himdex_starter\prepared\text_classification\hf_ag_news.csv --checkpoint checkpoints\himdex_text_base_v3.pt --output benchmarks\ag_news_hybrid_base_v3.json
+himdex-hybrid train --data data\himdex_starter\prepared\text_classification\hf_ag_news.csv --checkpoint checkpoints\himdex_text_base_v3.pt --output checkpoints\himdex_hybrid_ag_news_base_v3.joblib
 ```
