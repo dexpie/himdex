@@ -101,6 +101,13 @@ Fine-tune only the task head when you want a fast, low-VRAM local experiment:
 himdex-train --task text-classification --data data\reviews.csv --resume-from checkpoints\himdex_ag_news_pure_avg_v2.pt --freeze-backbone --epochs 1 --batch-size 64
 ```
 
+Use layer-wise learning rates and gradient accumulation for safer full-model
+polish runs:
+
+```powershell
+himdex-train --task text-classification --data data\reviews.csv --resume-from checkpoints\himdex_ag_news_pure_avg_v2.pt --backbone-lr 2e-6 --head-lr 2e-5 --grad-accum-steps 2 --batch-size 32
+```
+
 Custom columns:
 
 ```powershell

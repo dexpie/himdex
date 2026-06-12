@@ -24,8 +24,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--epochs", type=int, default=3)
     parser.add_argument("--batch-size", type=int, default=16)
     parser.add_argument("--lr", type=float, default=3e-4)
+    parser.add_argument("--backbone-lr", type=float, default=None)
+    parser.add_argument("--head-lr", type=float, default=None)
     parser.add_argument("--weight-decay", type=float, default=0.05)
     parser.add_argument("--grad-clip", type=float, default=1.0)
+    parser.add_argument("--grad-accum-steps", type=int, default=1)
     parser.add_argument("--validation-ratio", type=float, default=0.1)
     parser.add_argument("--image-size", type=int, default=224)
     parser.add_argument("--patch-size", type=int, default=16)
@@ -64,6 +67,62 @@ def freeze_backbone_parameters(model: nn.Module) -> int:
     return sum(parameter.numel() for parameter in model.parameters() if parameter.requires_grad)
 
 
+def build_optimizer(
+    model: nn.Module,
+    lr: float,
+    weight_decay: float,
+    backbone_lr: float | None = None,
+    head_lr: float | None = None,
+) -> torch.optim.Optimizer:
+    if backbone_lr is None and head_lr is None:
+        return torch.optim.AdamW(
+            (parameter for parameter in model.parameters() if parameter.requires_grad),
+            lr=lr,
+            weight_decay=weight_decay,
+        )
+
+    resolved_backbone_lr = lr if backbone_lr is None else backbone_lr
+    resolved_head_lr = lr if head_lr is None else head_lr
+    backbone_ids = (
+        {id(parameter) for parameter in model.backbone.parameters()}
+        if hasattr(model, "backbone")
+        else set()
+    )
+    backbone_parameters = [
+        parameter
+        for parameter in model.parameters()
+        if parameter.requires_grad and id(parameter) in backbone_ids
+    ]
+    head_parameters = [
+        parameter
+        for parameter in model.parameters()
+        if parameter.requires_grad and id(parameter) not in backbone_ids
+    ]
+
+    parameter_groups = []
+    if backbone_parameters:
+        parameter_groups.append(
+            {
+                "params": backbone_parameters,
+                "lr": resolved_backbone_lr,
+                "weight_decay": weight_decay,
+                "name": "backbone",
+            }
+        )
+    if head_parameters:
+        parameter_groups.append(
+            {
+                "params": head_parameters,
+                "lr": resolved_head_lr,
+                "weight_decay": weight_decay,
+                "name": "head",
+            }
+        )
+    if not parameter_groups:
+        raise ValueError("No trainable parameters available")
+    return torch.optim.AdamW(parameter_groups)
+
+
 def run_epoch(
     model: nn.Module,
     loader: DataLoader,
@@ -72,7 +131,10 @@ def run_epoch(
     optimizer: torch.optim.Optimizer | None = None,
     grad_clip: float = 1.0,
     freeze_backbone: bool = False,
+    grad_accum_steps: int = 1,
 ) -> tuple[float, float]:
+    if grad_accum_steps < 1:
+        raise ValueError("grad_accum_steps must be at least 1")
     training = optimizer is not None
     model.train(training)
     if training and freeze_backbone and hasattr(model, "backbone"):
@@ -84,7 +146,9 @@ def run_epoch(
     scaler = torch.amp.GradScaler("cuda", enabled=training and device.type == "cuda")
 
     progress = tqdm(loader, desc="train" if training else "validate", leave=False)
-    for batch in progress:
+    if training:
+        optimizer.zero_grad(set_to_none=True)
+    for step, batch in enumerate(progress, start=1):
         if task == "text-classification":
             inputs = (
                 batch["input_ids"].to(device),
@@ -96,21 +160,22 @@ def run_epoch(
             inputs = (images.to(device),)
             labels = labels.to(device)
 
-        if training:
-            optimizer.zero_grad(set_to_none=True)
         with torch.set_grad_enabled(training):
             with torch.autocast(device_type=device.type, enabled=device.type == "cuda"):
                 logits = model(*inputs)
                 loss = loss_fn(logits, labels)
             if training:
-                scaler.scale(loss).backward()
-                scaler.unscale_(optimizer)
-                nn.utils.clip_grad_norm_(
-                    (parameter for parameter in model.parameters() if parameter.requires_grad),
-                    grad_clip,
-                )
-                scaler.step(optimizer)
-                scaler.update()
+                scaled_loss = loss / grad_accum_steps
+                scaler.scale(scaled_loss).backward()
+                if step % grad_accum_steps == 0 or step == len(loader):
+                    scaler.unscale_(optimizer)
+                    nn.utils.clip_grad_norm_(
+                        (parameter for parameter in model.parameters() if parameter.requires_grad),
+                        grad_clip,
+                    )
+                    scaler.step(optimizer)
+                    scaler.update()
+                    optimizer.zero_grad(set_to_none=True)
 
         batch_size = labels.size(0)
         total_loss += loss.item() * batch_size
@@ -125,6 +190,8 @@ def main() -> None:
     args = parse_args()
     if args.backbone_from and args.resume_from:
         raise ValueError("Use either --backbone-from or --resume-from, not both.")
+    if args.grad_accum_steps < 1:
+        raise ValueError("--grad-accum-steps must be at least 1")
     random.seed(args.seed)
     torch.manual_seed(args.seed)
     device = torch.device(args.device)
@@ -185,13 +252,16 @@ def main() -> None:
     validation_loader = DataLoader(validation_dataset, batch_size=args.batch_size, num_workers=0)
 
     model.to(device)
-    optimizer = torch.optim.AdamW(
-        (parameter for parameter in model.parameters() if parameter.requires_grad),
+    optimizer = build_optimizer(
+        model=model,
         lr=args.lr,
         weight_decay=args.weight_decay,
+        backbone_lr=args.backbone_lr,
+        head_lr=args.head_lr,
     )
+    min_learning_rate = min(group["lr"] for group in optimizer.param_groups)
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
-        optimizer, T_max=max(args.epochs, 1), eta_min=args.lr * 0.1
+        optimizer, T_max=max(args.epochs, 1), eta_min=min_learning_rate * 0.1
     )
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -206,6 +276,7 @@ def main() -> None:
             optimizer,
             args.grad_clip,
             freeze_backbone=args.freeze_backbone,
+            grad_accum_steps=args.grad_accum_steps,
         )
         validation_loss, validation_accuracy = run_epoch(
             model, validation_loader, device, args.task
@@ -227,6 +298,9 @@ def main() -> None:
                     "validation_loss": validation_loss,
                     "validation_accuracy": validation_accuracy,
                     "learning_rate": optimizer.param_groups[0]["lr"],
+                    "optimizer_lrs": [group["lr"] for group in optimizer.param_groups],
+                    "grad_accum_steps": args.grad_accum_steps,
+                    "effective_batch_size": args.batch_size * args.grad_accum_steps,
                     "freeze_backbone": args.freeze_backbone,
                     "trainable_parameters": trainable_parameters,
                     "model_state": model.state_dict(),

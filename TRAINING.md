@@ -48,6 +48,12 @@ Run a fast head-only polish pass:
 himdex-train --task text-classification --data data\himdex_starter\prepared\text_classification\hf_ag_news.csv --resume-from checkpoints\himdex_ag_news_pure_avg_v2.pt --freeze-backbone --epochs 1 --batch-size 64 --lr 1e-4
 ```
 
+Run a layer-wise polish pass with a slower backbone learning rate:
+
+```powershell
+himdex-train --task text-classification --data data\himdex_starter\prepared\text_classification\hf_ag_news.csv --resume-from checkpoints\himdex_ag_news_pure_avg_v2.pt --epochs 1 --batch-size 64 --backbone-lr 2e-6 --head-lr 2e-5 --weight-decay 0.01
+```
+
 For open-source releases, keep raw datasets out of git. Commit code, configs,
 docs, and compact reference checkpoints only.
 
@@ -69,6 +75,11 @@ Pure Himdex Base v3 continued classifier: 65.08%
 Latest head-only polish test from `himdex_ag_news_pure_avg_v2.pt` trained only
 1,540 parameters and reached 69.42% validation accuracy, so it was kept as an
 experiment instead of replacing the 69.66% released checkpoint.
+
+Latest layer-wise polish test from `himdex_ag_news_pure_avg_v2.pt` used
+`backbone_lr=2e-6` and `head_lr=2e-5`, reaching 69.32% validation accuracy.
+That confirms the released averaged checkpoint remains the stronger pure neural
+artifact for now.
 
 The next pure-neural training target is to reduce this gap with stronger
 pretraining, subword/character-aware text encoders, better pooling, and

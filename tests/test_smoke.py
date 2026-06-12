@@ -7,7 +7,7 @@ from himdex.checkpoint_tools import average_state_dicts
 from himdex.distill_text import DistillationTextDataset
 from himdex.evaluate import evaluate_checkpoint
 from himdex.hybrid_model import predict_texts, train_hybrid_model
-from himdex.train import freeze_backbone_parameters
+from himdex.train import build_optimizer, freeze_backbone_parameters
 
 from himdex import (
     ByteTokenizer,
@@ -242,3 +242,19 @@ def test_freeze_backbone_parameters_keeps_head_trainable():
     assert trainable > 0
     assert not any(parameter.requires_grad for parameter in model.backbone.parameters())
     assert all(parameter.requires_grad for parameter in model.classifier.parameters())
+
+
+def test_build_optimizer_supports_layerwise_learning_rates():
+    config = HimdexConfig(max_text_length=16, hidden_size=32, num_layers=1, num_heads=4)
+    model = HimdexForTextClassification(config, num_labels=2)
+
+    optimizer = build_optimizer(
+        model,
+        lr=1e-4,
+        weight_decay=0.01,
+        backbone_lr=1e-5,
+        head_lr=2e-4,
+    )
+
+    assert [group["name"] for group in optimizer.param_groups] == ["backbone", "head"]
+    assert [group["lr"] for group in optimizer.param_groups] == [1e-5, 2e-4]

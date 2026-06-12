@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.12.0 - 2026-06-12
+
+- Added `--backbone-lr` and `--head-lr` to `himdex-train` for layer-wise
+  fine-tuning.
+- Added `--grad-accum-steps` so local runs can use a larger effective batch
+  size without increasing VRAM.
+- Stored optimizer learning rates, gradient accumulation steps, and effective
+  batch size in classification checkpoints.
+- Adjusted cosine LR scheduling to respect the smallest optimizer group LR.
+- Added smoke coverage for layer-wise optimizer groups.
+- Tested a layer-wise polish pass from `himdex_ag_news_pure_avg_v2.pt`; it
+  reached 69.32%, so the 69.66% released checkpoint remains the pure neural
+  best.
+
 ## 0.11.0 - 2026-06-12
 
 - Added `--freeze-backbone` to `himdex-train` for fast head-only fine-tuning.
