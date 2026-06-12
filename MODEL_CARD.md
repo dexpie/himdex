@@ -36,6 +36,7 @@ masked-byte validation loss from 3.1468 to 3.1322 compared with Base v2.
 
 Results use deterministic random validation splits created by the Himdex CLI.
 They are development benchmarks, not official dataset leaderboard submissions.
+Classification checkpoints can be re-evaluated with `himdex-evaluate`.
 
 | Task | Dataset | Validation split | Best accuracy | Best loss |
 | --- | --- | ---: | ---: | ---: |

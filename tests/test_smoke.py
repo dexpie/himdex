@@ -5,6 +5,7 @@ import torch
 from himdex.benchmark_tfidf import himdex_split_indices, run_benchmark
 from himdex.checkpoint_tools import average_state_dicts
 from himdex.distill_text import DistillationTextDataset
+from himdex.evaluate import evaluate_checkpoint
 from himdex.hybrid_model import predict_texts, train_hybrid_model
 
 from himdex import (
@@ -193,3 +194,39 @@ def test_average_state_dicts_blends_float_tensors():
 
     assert torch.allclose(averaged["weight"], torch.tensor([1.5, 4.0]))
     assert averaged["step"].item() == 1
+
+
+def test_evaluate_checkpoint_runs_on_toy_text_data(tmp_path):
+    data_path = tmp_path / "toy.csv"
+    data_path.write_text(
+        "text,label\n"
+        "space rocket,space\n"
+        "orbit satellite,space\n"
+        "team goal,sports\n"
+        "coach match,sports\n",
+        encoding="utf-8",
+    )
+    tokenizer = ByteTokenizer()
+    config = HimdexConfig(max_text_length=16, hidden_size=32, num_layers=1, num_heads=4)
+    model = HimdexForTextClassification(config, num_labels=2)
+    checkpoint_path = tmp_path / "himdex.pt"
+    torch.save(
+        {
+            "task": "text-classification",
+            "config": config.to_dict(),
+            "label_to_id": {"space": 0, "sports": 1},
+            "model_state": model.state_dict(),
+        },
+        checkpoint_path,
+    )
+
+    metrics = evaluate_checkpoint(
+        checkpoint_path,
+        data_path,
+        batch_size=2,
+        validation_ratio=0.5,
+        device="cpu",
+    )
+
+    assert metrics["validation_samples"] == 2
+    assert 0.0 <= metrics["validation_accuracy"] <= 1.0

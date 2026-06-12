@@ -43,6 +43,7 @@ himdex-benchmark-tfidf --data data\himdex_starter\prepared\text_classification\h
 himdex-benchmark-hybrid --data data\himdex_starter\prepared\text_classification\hf_ag_news.csv --checkpoint checkpoints\himdex_text_base_v2.pt --output benchmarks\ag_news_hybrid.json
 himdex-benchmark-hybrid --data data\himdex_starter\prepared\text_classification\hf_ag_news.csv --checkpoint checkpoints\himdex_text_base_v3.pt --output benchmarks\ag_news_hybrid_base_v3.json
 himdex-hybrid train --data data\himdex_starter\prepared\text_classification\hf_ag_news.csv --checkpoint checkpoints\himdex_text_base_v3.pt --output checkpoints\himdex_hybrid_ag_news_base_v3.joblib
+himdex-evaluate --checkpoint checkpoints\himdex_ag_news_pure_avg_v2.pt --data data\himdex_starter\prepared\text_classification\hf_ag_news.csv --batch-size 64 --output benchmarks\ag_news_pure_avg_v2_eval.json
 himdex-distill-text --data data\himdex_starter\prepared\text_classification\hf_ag_news.csv --teacher checkpoints\himdex_hybrid_ag_news_base_v3.joblib --backbone-from checkpoints\himdex_text_base_v3.pt --resume-from runs\himdex_ag_news_pure_cls_mean_continued\himdex.pt
 himdex-average-checkpoints --first runs\himdex_ag_news_v2_continued\himdex.pt --second runs\himdex_ag_news_v2_best_distill_a01\himdex.pt --second-weight 0.74 --output checkpoints\himdex_ag_news_pure_avg_v2.pt
 ```

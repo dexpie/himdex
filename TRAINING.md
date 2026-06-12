@@ -36,6 +36,12 @@ Continue from a checkpoint:
 himdex-pretrain-text --data data\himdex_pack\prepared --resume-from checkpoints\himdex_text_base_v3.pt --epochs 1 --batch-size 16 --max-steps 2000 --output-dir runs\himdex_text_base_v3_continued
 ```
 
+Evaluate a classification checkpoint:
+
+```powershell
+himdex-evaluate --checkpoint checkpoints\himdex_ag_news_pure_avg_v2.pt --data data\himdex_starter\prepared\text_classification\hf_ag_news.csv --batch-size 64
+```
+
 For open-source releases, keep raw datasets out of git. Commit code, configs,
 docs, and compact reference checkpoints only.
 

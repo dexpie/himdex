@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.10.0 - 2026-06-12
+
+- Added `himdex-evaluate`, a reproducible evaluation CLI for text and image
+  classification checkpoints.
+- Added a smoke test for checkpoint evaluation on toy text data.
+- Recorded a generated AG News evaluation JSON for the current pure averaged
+  checkpoint.
+- Tested a low-learning-rate polish pass from `himdex_ag_news_pure_avg_v2.pt`;
+  it did not beat the released 69.66% checkpoint, so no weaker checkpoint was
+  promoted.
+
 ## 0.9.0 - 2026-06-12
 
 - Added the refined pure averaged AG News checkpoint

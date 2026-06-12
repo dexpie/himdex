@@ -200,6 +200,12 @@ himdex-hybrid train --data data\himdex_pack\prepared\text_classification\hf_ag_n
 himdex-hybrid predict --model checkpoints\himdex_hybrid_ag_news_base_v3.joblib --checkpoint checkpoints\himdex_text_base_v3.pt --text "NASA launches a new satellite"
 ```
 
+Evaluate a classification checkpoint on the deterministic Himdex split:
+
+```powershell
+himdex-evaluate --checkpoint checkpoints\himdex_ag_news_pure_avg_v2.pt --data data\himdex_starter\prepared\text_classification\hf_ag_news.csv --output benchmarks\ag_news_pure_avg_v2_eval.json
+```
+
 Distill the hybrid teacher into a pure neural classifier:
 
 ```powershell
