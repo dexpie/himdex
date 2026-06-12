@@ -95,6 +95,12 @@ Use a stronger pure neural pooling head:
 himdex-train --task text-classification --data data\reviews.csv --backbone-from checkpoints\himdex_text_base_v3.pt --text-pooling cls-mean
 ```
 
+Fine-tune only the task head when you want a fast, low-VRAM local experiment:
+
+```powershell
+himdex-train --task text-classification --data data\reviews.csv --resume-from checkpoints\himdex_ag_news_pure_avg_v2.pt --freeze-backbone --epochs 1 --batch-size 64
+```
+
 Custom columns:
 
 ```powershell

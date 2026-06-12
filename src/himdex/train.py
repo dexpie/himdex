@@ -36,6 +36,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--text-pooling", choices=["cls", "mean", "cls-mean"], default="cls")
     parser.add_argument("--text-column", default="text")
     parser.add_argument("--label-column", default="label")
+    parser.add_argument("--freeze-backbone", action="store_true", help="Train only the task head.")
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
     return parser.parse_args()
@@ -55,6 +56,14 @@ def load_backbone(model: nn.Module, checkpoint_path: str) -> None:
     print(f"loaded backbone {checkpoint_path}; missing={len(missing)}")
 
 
+def freeze_backbone_parameters(model: nn.Module) -> int:
+    if not hasattr(model, "backbone"):
+        raise ValueError("Model has no backbone to freeze")
+    for parameter in model.backbone.parameters():
+        parameter.requires_grad = False
+    return sum(parameter.numel() for parameter in model.parameters() if parameter.requires_grad)
+
+
 def run_epoch(
     model: nn.Module,
     loader: DataLoader,
@@ -62,9 +71,12 @@ def run_epoch(
     task: str,
     optimizer: torch.optim.Optimizer | None = None,
     grad_clip: float = 1.0,
+    freeze_backbone: bool = False,
 ) -> tuple[float, float]:
     training = optimizer is not None
     model.train(training)
+    if training and freeze_backbone and hasattr(model, "backbone"):
+        model.backbone.eval()
     loss_fn = nn.CrossEntropyLoss()
     total_loss = 0.0
     correct = 0
@@ -93,7 +105,10 @@ def run_epoch(
             if training:
                 scaler.scale(loss).backward()
                 scaler.unscale_(optimizer)
-                nn.utils.clip_grad_norm_(model.parameters(), grad_clip)
+                nn.utils.clip_grad_norm_(
+                    (parameter for parameter in model.parameters() if parameter.requires_grad),
+                    grad_clip,
+                )
                 scaler.step(optimizer)
                 scaler.update()
 
@@ -153,6 +168,13 @@ def main() -> None:
     elif args.backbone_from:
         load_backbone(model, args.backbone_from)
 
+    trainable_parameters = sum(parameter.numel() for parameter in model.parameters())
+    if args.freeze_backbone:
+        trainable_parameters = freeze_backbone_parameters(model)
+        print(f"froze backbone; trainable_parameters={trainable_parameters}")
+    if trainable_parameters == 0:
+        raise ValueError("No trainable parameters available")
+
     validation_size = max(1, int(len(dataset) * args.validation_ratio))
     train_size = len(dataset) - validation_size
     generator = torch.Generator().manual_seed(args.seed)
@@ -164,7 +186,9 @@ def main() -> None:
 
     model.to(device)
     optimizer = torch.optim.AdamW(
-        model.parameters(), lr=args.lr, weight_decay=args.weight_decay
+        (parameter for parameter in model.parameters() if parameter.requires_grad),
+        lr=args.lr,
+        weight_decay=args.weight_decay,
     )
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
         optimizer, T_max=max(args.epochs, 1), eta_min=args.lr * 0.1
@@ -175,7 +199,13 @@ def main() -> None:
 
     for epoch in range(1, args.epochs + 1):
         train_loss, train_accuracy = run_epoch(
-            model, train_loader, device, args.task, optimizer, args.grad_clip
+            model,
+            train_loader,
+            device,
+            args.task,
+            optimizer,
+            args.grad_clip,
+            freeze_backbone=args.freeze_backbone,
         )
         validation_loss, validation_accuracy = run_epoch(
             model, validation_loader, device, args.task
@@ -197,6 +227,8 @@ def main() -> None:
                     "validation_loss": validation_loss,
                     "validation_accuracy": validation_accuracy,
                     "learning_rate": optimizer.param_groups[0]["lr"],
+                    "freeze_backbone": args.freeze_backbone,
+                    "trainable_parameters": trainable_parameters,
                     "model_state": model.state_dict(),
                 },
                 output_dir / "himdex.pt",

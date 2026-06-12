@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.11.0 - 2026-06-12
+
+- Added `--freeze-backbone` to `himdex-train` for fast head-only fine-tuning.
+- Kept frozen backbones in eval mode during training so head-only experiments
+  use stable representations.
+- Saved `freeze_backbone` and `trainable_parameters` metadata in training
+  checkpoints.
+- Added smoke coverage for freezing the backbone while keeping the classifier
+  trainable.
+- Tested a head-only polish pass from `himdex_ag_news_pure_avg_v2.pt`; it
+  trained only 1,540 parameters and reached 69.42%, so the 69.66% checkpoint
+  remains the released pure neural best.
+
 ## 0.10.0 - 2026-06-12
 
 - Added `himdex-evaluate`, a reproducible evaluation CLI for text and image

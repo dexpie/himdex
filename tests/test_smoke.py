@@ -7,6 +7,7 @@ from himdex.checkpoint_tools import average_state_dicts
 from himdex.distill_text import DistillationTextDataset
 from himdex.evaluate import evaluate_checkpoint
 from himdex.hybrid_model import predict_texts, train_hybrid_model
+from himdex.train import freeze_backbone_parameters
 
 from himdex import (
     ByteTokenizer,
@@ -230,3 +231,14 @@ def test_evaluate_checkpoint_runs_on_toy_text_data(tmp_path):
 
     assert metrics["validation_samples"] == 2
     assert 0.0 <= metrics["validation_accuracy"] <= 1.0
+
+
+def test_freeze_backbone_parameters_keeps_head_trainable():
+    config = HimdexConfig(max_text_length=16, hidden_size=32, num_layers=1, num_heads=4)
+    model = HimdexForTextClassification(config, num_labels=2)
+
+    trainable = freeze_backbone_parameters(model)
+
+    assert trainable > 0
+    assert not any(parameter.requires_grad for parameter in model.backbone.parameters())
+    assert all(parameter.requires_grad for parameter in model.classifier.parameters())
