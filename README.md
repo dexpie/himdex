@@ -26,7 +26,8 @@ masked-byte prediction steps from Base v2.
 
 | Benchmark | Validation accuracy |
 | --- | ---: |
-| AG News pure Himdex averaged checkpoint | 69.58% |
+| AG News pure Himdex averaged checkpoint | 69.66% |
+| AG News pure Himdex averaged checkpoint v1 | 69.58% |
 | AG News pure Himdex previous best | 69.24% |
 | AG News pure Himdex Base v3 distilled + polished | 67.60% |
 | AG News pure Himdex Base v3 cls-mean | 66.98% |
@@ -208,7 +209,7 @@ himdex-distill-text --data data\himdex_pack\prepared\text_classification\hf_ag_n
 Average compatible pure checkpoints:
 
 ```powershell
-himdex-average-checkpoints --first runs\himdex_ag_news_v2_continued\himdex.pt --second runs\himdex_ag_news_v2_best_distill_a01\himdex.pt --second-weight 0.7 --output checkpoints\himdex_ag_news_pure_avg_v1.pt
+himdex-average-checkpoints --first runs\himdex_ag_news_v2_continued\himdex.pt --second runs\himdex_ag_news_v2_best_distill_a01\himdex.pt --second-weight 0.74 --output checkpoints\himdex_ag_news_pure_avg_v2.pt
 ```
 
 ## Reference Checkpoint
@@ -217,7 +218,7 @@ This repository includes a compact reference checkpoint:
 
 ```text
 checkpoints/himdex_text_base_v3.pt
-checkpoints/himdex_ag_news_pure_avg_v1.pt
+checkpoints/himdex_ag_news_pure_avg_v2.pt
 checkpoints/himdex_hybrid_ag_news_base_v3.joblib
 ```
 

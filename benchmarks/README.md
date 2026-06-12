@@ -30,6 +30,7 @@ Results:
 | TF-IDF word + character | 91.90% |
 | TF-IDF word + character + Himdex Base v2 embedding | 91.94% |
 | TF-IDF word + character + Himdex Base v3 embedding | 92.00% |
+| Himdex pure averaged classifier v2 | 69.66% |
 | Himdex pure averaged classifier v1 | 69.58% |
 | Himdex Base v3 distilled + polished classifier | 67.60% |
 | Himdex Base v3 cls-mean classifier | 66.98% |
@@ -43,5 +44,5 @@ himdex-benchmark-hybrid --data data\himdex_starter\prepared\text_classification\
 himdex-benchmark-hybrid --data data\himdex_starter\prepared\text_classification\hf_ag_news.csv --checkpoint checkpoints\himdex_text_base_v3.pt --output benchmarks\ag_news_hybrid_base_v3.json
 himdex-hybrid train --data data\himdex_starter\prepared\text_classification\hf_ag_news.csv --checkpoint checkpoints\himdex_text_base_v3.pt --output checkpoints\himdex_hybrid_ag_news_base_v3.joblib
 himdex-distill-text --data data\himdex_starter\prepared\text_classification\hf_ag_news.csv --teacher checkpoints\himdex_hybrid_ag_news_base_v3.joblib --backbone-from checkpoints\himdex_text_base_v3.pt --resume-from runs\himdex_ag_news_pure_cls_mean_continued\himdex.pt
-himdex-average-checkpoints --first runs\himdex_ag_news_v2_continued\himdex.pt --second runs\himdex_ag_news_v2_best_distill_a01\himdex.pt --second-weight 0.7 --output checkpoints\himdex_ag_news_pure_avg_v1.pt
+himdex-average-checkpoints --first runs\himdex_ag_news_v2_continued\himdex.pt --second runs\himdex_ag_news_v2_best_distill_a01\himdex.pt --second-weight 0.74 --output checkpoints\himdex_ag_news_pure_avg_v2.pt
 ```

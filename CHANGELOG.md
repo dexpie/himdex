@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.9.0 - 2026-06-12
+
+- Added the refined pure averaged AG News checkpoint
+  `himdex_ag_news_pure_avg_v2.pt`.
+- Improved the pure Himdex AG News validation best from 69.58% to 69.66% by
+  narrowing the interpolation search around the distilled checkpoint.
+- Recorded the new benchmark and checkpoint metadata for reproducible local
+  comparison.
+
 ## 0.8.0 - 2026-06-12
 
 - Added `himdex-average-checkpoints` for averaging compatible Himdex model
