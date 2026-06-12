@@ -1,0 +1,14 @@
+{
+  "name": "Himdex AG News pure averaged classifier v1",
+  "checkpoint": "checkpoints\\himdex_ag_news_pure_avg_v1.pt",
+  "dataset": "data\\himdex_starter\\prepared\\text_classification\\hf_ag_news.csv",
+  "validation_ratio": 0.1,
+  "seed": 42,
+  "validation_accuracy": 0.6958,
+  "validation_loss": 0.7708,
+  "interpolation_search": {
+    "best_second_weight": 0.7,
+    "first_checkpoint": "runs\\himdex_ag_news_v2_continued\\himdex.pt",
+    "second_checkpoint": "runs\\himdex_ag_news_v2_best_distill_a01\\himdex.pt"
+  }
+}

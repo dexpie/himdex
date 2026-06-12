@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.8.0 - 2026-06-12
+
+- Added `himdex-average-checkpoints` for averaging compatible Himdex model
+  checkpoints.
+- Added the pure averaged AG News checkpoint `himdex_ag_news_pure_avg_v1.pt`.
+- Improved the pure Himdex AG News best from 69.24% to 69.58% validation
+  accuracy by averaging the previous pure best with a distilled checkpoint.
+
 ## 0.7.0 - 2026-06-12
 
 - Added `himdex-distill-text` for distilling a packaged Himdex Hybrid teacher

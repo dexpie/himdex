@@ -3,6 +3,7 @@ from pathlib import Path
 import torch
 
 from himdex.benchmark_tfidf import himdex_split_indices, run_benchmark
+from himdex.checkpoint_tools import average_state_dicts
 from himdex.distill_text import DistillationTextDataset
 from himdex.hybrid_model import predict_texts, train_hybrid_model
 
@@ -176,3 +177,19 @@ def test_distillation_dataset_aligns_teacher_scores(tmp_path):
     item = dataset[0]
     assert item["label"].item() == 0
     assert torch.equal(item["teacher_scores"], teacher_scores[0])
+
+
+def test_average_state_dicts_blends_float_tensors():
+    first = {
+        "weight": torch.tensor([1.0, 3.0]),
+        "step": torch.tensor(1),
+    }
+    second = {
+        "weight": torch.tensor([3.0, 7.0]),
+        "step": torch.tensor(2),
+    }
+
+    averaged = average_state_dicts(first, second, second_weight=0.25)
+
+    assert torch.allclose(averaged["weight"], torch.tensor([1.5, 4.0]))
+    assert averaged["step"].item() == 1
