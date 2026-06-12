@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.14.0 - 2026-06-12
+
+- Added `himdex-search-hybrid`, a cached grid-search CLI for Himdex Hybrid text
+  classifiers.
+- Added the searched AG News hybrid artifact
+  `himdex_hybrid_ag_news_search_v1.joblib`.
+- Improved the strongest packaged AG News artifact from 92.26% to 92.34%
+  validation accuracy with `embedding_weight=1.3` and `classifier_c=0.9`.
+- Added benchmark search output for the winning grid.
+
 ## 0.13.0 - 2026-06-12
 
 - Tuned the packaged AG News Himdex Hybrid model by lowering the LinearSVC

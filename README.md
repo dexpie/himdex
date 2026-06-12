@@ -33,6 +33,7 @@ masked-byte prediction steps from Base v2.
 | AG News pure Himdex Base v3 cls-mean | 66.98% |
 | AG News pure Himdex Base v3 continued | 65.08% |
 | AG News TF-IDF word+char baseline | 91.90% |
+| AG News Himdex Hybrid searched model | 92.34% |
 | AG News Himdex Hybrid packaged model v2 | 92.26% |
 | AG News Himdex Hybrid packaged model v1 | 92.00% |
 | Beans image classification | 78.71% |
@@ -207,11 +208,17 @@ Himdex embeddings:
 himdex-benchmark-hybrid --data data\himdex_pack\prepared\text_classification\hf_ag_news.csv --checkpoint checkpoints\himdex_text_base_v3.pt
 ```
 
+Search hybrid settings with cached Himdex embeddings:
+
+```powershell
+himdex-search-hybrid --data data\himdex_pack\prepared\text_classification\hf_ag_news.csv --checkpoint checkpoints\himdex_text_base_v3.pt --output benchmarks\ag_news_hybrid_search_v1.json --output-model checkpoints\himdex_hybrid_ag_news_search_v1.joblib
+```
+
 Train and run a persisted Himdex Hybrid text classifier:
 
 ```powershell
-himdex-hybrid train --data data\himdex_pack\prepared\text_classification\hf_ag_news.csv --checkpoint checkpoints\himdex_text_base_v3.pt --output checkpoints\himdex_hybrid_ag_news_base_v3_v2.joblib
-himdex-hybrid predict --model checkpoints\himdex_hybrid_ag_news_base_v3_v2.joblib --checkpoint checkpoints\himdex_text_base_v3.pt --text "NASA launches a new satellite"
+himdex-hybrid train --data data\himdex_pack\prepared\text_classification\hf_ag_news.csv --checkpoint checkpoints\himdex_text_base_v3.pt --embedding-weight 1.3 --classifier-c 0.9 --output checkpoints\himdex_hybrid_ag_news_search_v1.joblib
+himdex-hybrid predict --model checkpoints\himdex_hybrid_ag_news_search_v1.joblib --checkpoint checkpoints\himdex_text_base_v3.pt --text "NASA launches a new satellite"
 ```
 
 Evaluate a classification checkpoint on the deterministic Himdex split:
@@ -223,7 +230,7 @@ himdex-evaluate --checkpoint checkpoints\himdex_ag_news_pure_avg_v2.pt --data da
 Distill the hybrid teacher into a pure neural classifier:
 
 ```powershell
-himdex-distill-text --data data\himdex_pack\prepared\text_classification\hf_ag_news.csv --teacher checkpoints\himdex_hybrid_ag_news_base_v3_v2.joblib --backbone-from checkpoints\himdex_text_base_v3.pt --resume-from runs\himdex_ag_news_pure_cls_mean_continued\himdex.pt
+himdex-distill-text --data data\himdex_pack\prepared\text_classification\hf_ag_news.csv --teacher checkpoints\himdex_hybrid_ag_news_search_v1.joblib --backbone-from checkpoints\himdex_text_base_v3.pt --resume-from runs\himdex_ag_news_pure_cls_mean_continued\himdex.pt
 ```
 
 Average compatible pure checkpoints:
@@ -239,7 +246,7 @@ This repository includes a compact reference checkpoint:
 ```text
 checkpoints/himdex_text_base_v3.pt
 checkpoints/himdex_ag_news_pure_avg_v2.pt
-checkpoints/himdex_hybrid_ag_news_base_v3_v2.joblib
+checkpoints/himdex_hybrid_ag_news_search_v1.joblib
 ```
 
 It is trained with masked byte prediction and can be used to test loading,

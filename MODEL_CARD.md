@@ -60,10 +60,11 @@ train/validation split as the Himdex fine-tuning run.
 | TF-IDF character 3-5 gram | 169,009 | 91.46% |
 | TF-IDF word + character | 369,009 | 91.90% |
 | TF-IDF word + character + Himdex Base v2 embedding | 369,393 | 91.94% |
+| TF-IDF word + character + Himdex Base v3 embedding searched | 369,393 | 92.34% |
 | TF-IDF word + character + Himdex Base v3 embedding v2 | 369,393 | 92.26% |
 | TF-IDF word + character + Himdex Base v3 embedding v1 | 369,393 | 92.00% |
 
-The packaged Himdex Hybrid AG News v2 model is the strongest text artifact in this
+The searched Himdex Hybrid AG News model is the strongest text artifact in this
 repository so far. It beats the strongest sparse-only TF-IDF baseline on this
 split, while also making the next research target clear: close the gap between
 the pure neural model and the hybrid/classical baseline.

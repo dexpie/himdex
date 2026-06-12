@@ -1,0 +1,24 @@
+{
+  "name": "himdex_hybrid_ag_news_search_v1",
+  "artifact": "himdex_hybrid_ag_news_search_v1.joblib",
+  "format": "himdex-hybrid-text-classifier-v1",
+  "base_checkpoint": "himdex_text_base_v3.pt",
+  "dataset": "data/himdex_starter/prepared/text_classification/hf_ag_news.csv",
+  "validation_ratio": 0.1,
+  "seed": 42,
+  "train_samples": 45000,
+  "validation_samples": 5000,
+  "features": 369393,
+  "word_ngram_range": [1, 2],
+  "char_ngram_range": [3, 5],
+  "max_features": 200000,
+  "embedding_weight": 1.3,
+  "classifier_c": 0.9,
+  "accuracy": 0.9234,
+  "comparison": {
+    "previous_hybrid_v2": 0.9226,
+    "previous_hybrid_v1": 0.92,
+    "tfidf_word_char": 0.919,
+    "pure_neural_best": 0.6966
+  }
+}

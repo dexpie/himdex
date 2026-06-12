@@ -7,6 +7,7 @@ from himdex.checkpoint_tools import average_state_dicts
 from himdex.distill_text import DistillationTextDataset
 from himdex.evaluate import evaluate_checkpoint
 from himdex.hybrid_model import predict_texts, train_hybrid_model
+from himdex.search_hybrid import parse_float_list, parse_int_list, parse_ngram_ranges
 from himdex.train import build_optimizer, freeze_backbone_parameters
 
 from himdex import (
@@ -258,3 +259,9 @@ def test_build_optimizer_supports_layerwise_learning_rates():
 
     assert [group["name"] for group in optimizer.param_groups] == ["backbone", "head"]
     assert [group["lr"] for group in optimizer.param_groups] == [1e-5, 2e-4]
+
+
+def test_hybrid_search_arg_parsers():
+    assert parse_float_list("0.5,1, 1.25") == [0.5, 1.0, 1.25]
+    assert parse_int_list("100, 200") == [100, 200]
+    assert parse_ngram_ranges("1-2,3-5") == [(1, 2), (3, 5)]

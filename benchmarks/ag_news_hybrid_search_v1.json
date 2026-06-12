@@ -1,0 +1,590 @@
+{
+  "dataset": "data\\himdex_starter\\prepared\\text_classification\\hf_ag_news.csv",
+  "checkpoint": "checkpoints\\himdex_text_base_v3.pt",
+  "validation_ratio": 0.1,
+  "seed": 42,
+  "train_samples": 45000,
+  "validation_samples": 5000,
+  "embedding_cache": "work\\ag_news_base_v3_embeddings.joblib",
+  "embedding_cache_hit": false,
+  "embedding_seconds": 71.9098775999737,
+  "best": {
+    "accuracy": 0.9234,
+    "word_ngram_range": [
+      1,
+      2
+    ],
+    "char_ngram_range": [
+      3,
+      5
+    ],
+    "max_features": 200000,
+    "embedding_weight": 1.3,
+    "classifier_c": 0.9,
+    "features": 369393,
+    "train_seconds": 10.463277600007132
+  },
+  "results": [
+    {
+      "accuracy": 0.9228,
+      "word_ngram_range": [
+        1,
+        2
+      ],
+      "char_ngram_range": [
+        3,
+        5
+      ],
+      "max_features": 200000,
+      "embedding_weight": 1.0,
+      "classifier_c": 0.8,
+      "features": 369393,
+      "train_seconds": 8.722429499961436
+    },
+    {
+      "accuracy": 0.9228,
+      "word_ngram_range": [
+        1,
+        2
+      ],
+      "char_ngram_range": [
+        3,
+        5
+      ],
+      "max_features": 200000,
+      "embedding_weight": 1.0,
+      "classifier_c": 0.9,
+      "features": 369393,
+      "train_seconds": 8.825084799958859
+    },
+    {
+      "accuracy": 0.9224,
+      "word_ngram_range": [
+        1,
+        2
+      ],
+      "char_ngram_range": [
+        3,
+        5
+      ],
+      "max_features": 200000,
+      "embedding_weight": 1.0,
+      "classifier_c": 1.0,
+      "features": 369393,
+      "train_seconds": 9.863488999952096
+    },
+    {
+      "accuracy": 0.922,
+      "word_ngram_range": [
+        1,
+        2
+      ],
+      "char_ngram_range": [
+        3,
+        5
+      ],
+      "max_features": 200000,
+      "embedding_weight": 1.0,
+      "classifier_c": 1.1,
+      "features": 369393,
+      "train_seconds": 10.704387299949303
+    },
+    {
+      "accuracy": 0.9212,
+      "word_ngram_range": [
+        1,
+        2
+      ],
+      "char_ngram_range": [
+        3,
+        5
+      ],
+      "max_features": 200000,
+      "embedding_weight": 1.0,
+      "classifier_c": 1.2,
+      "features": 369393,
+      "train_seconds": 11.192928100004792
+    },
+    {
+      "accuracy": 0.9226,
+      "word_ngram_range": [
+        1,
+        2
+      ],
+      "char_ngram_range": [
+        3,
+        5
+      ],
+      "max_features": 200000,
+      "embedding_weight": 1.1,
+      "classifier_c": 0.8,
+      "features": 369393,
+      "train_seconds": 8.820422899967525
+    },
+    {
+      "accuracy": 0.923,
+      "word_ngram_range": [
+        1,
+        2
+      ],
+      "char_ngram_range": [
+        3,
+        5
+      ],
+      "max_features": 200000,
+      "embedding_weight": 1.1,
+      "classifier_c": 0.9,
+      "features": 369393,
+      "train_seconds": 9.494302199978847
+    },
+    {
+      "accuracy": 0.9226,
+      "word_ngram_range": [
+        1,
+        2
+      ],
+      "char_ngram_range": [
+        3,
+        5
+      ],
+      "max_features": 200000,
+      "embedding_weight": 1.1,
+      "classifier_c": 1.0,
+      "features": 369393,
+      "train_seconds": 10.070103499980178
+    },
+    {
+      "accuracy": 0.9218,
+      "word_ngram_range": [
+        1,
+        2
+      ],
+      "char_ngram_range": [
+        3,
+        5
+      ],
+      "max_features": 200000,
+      "embedding_weight": 1.1,
+      "classifier_c": 1.1,
+      "features": 369393,
+      "train_seconds": 11.52301050000824
+    },
+    {
+      "accuracy": 0.9216,
+      "word_ngram_range": [
+        1,
+        2
+      ],
+      "char_ngram_range": [
+        3,
+        5
+      ],
+      "max_features": 200000,
+      "embedding_weight": 1.1,
+      "classifier_c": 1.2,
+      "features": 369393,
+      "train_seconds": 12.227886000007857
+    },
+    {
+      "accuracy": 0.9226,
+      "word_ngram_range": [
+        1,
+        2
+      ],
+      "char_ngram_range": [
+        3,
+        5
+      ],
+      "max_features": 200000,
+      "embedding_weight": 1.2,
+      "classifier_c": 0.8,
+      "features": 369393,
+      "train_seconds": 9.552226100000553
+    },
+    {
+      "accuracy": 0.923,
+      "word_ngram_range": [
+        1,
+        2
+      ],
+      "char_ngram_range": [
+        3,
+        5
+      ],
+      "max_features": 200000,
+      "embedding_weight": 1.2,
+      "classifier_c": 0.9,
+      "features": 369393,
+      "train_seconds": 9.851364800008014
+    },
+    {
+      "accuracy": 0.9224,
+      "word_ngram_range": [
+        1,
+        2
+      ],
+      "char_ngram_range": [
+        3,
+        5
+      ],
+      "max_features": 200000,
+      "embedding_weight": 1.2,
+      "classifier_c": 1.0,
+      "features": 369393,
+      "train_seconds": 10.292887099960353
+    },
+    {
+      "accuracy": 0.9218,
+      "word_ngram_range": [
+        1,
+        2
+      ],
+      "char_ngram_range": [
+        3,
+        5
+      ],
+      "max_features": 200000,
+      "embedding_weight": 1.2,
+      "classifier_c": 1.1,
+      "features": 369393,
+      "train_seconds": 11.342718300002161
+    },
+    {
+      "accuracy": 0.9214,
+      "word_ngram_range": [
+        1,
+        2
+      ],
+      "char_ngram_range": [
+        3,
+        5
+      ],
+      "max_features": 200000,
+      "embedding_weight": 1.2,
+      "classifier_c": 1.2,
+      "features": 369393,
+      "train_seconds": 12.354604099993594
+    },
+    {
+      "accuracy": 0.9226,
+      "word_ngram_range": [
+        1,
+        2
+      ],
+      "char_ngram_range": [
+        3,
+        5
+      ],
+      "max_features": 200000,
+      "embedding_weight": 1.25,
+      "classifier_c": 0.8,
+      "features": 369393,
+      "train_seconds": 9.508397699974012
+    },
+    {
+      "accuracy": 0.923,
+      "word_ngram_range": [
+        1,
+        2
+      ],
+      "char_ngram_range": [
+        3,
+        5
+      ],
+      "max_features": 200000,
+      "embedding_weight": 1.25,
+      "classifier_c": 0.9,
+      "features": 369393,
+      "train_seconds": 9.939828000031412
+    },
+    {
+      "accuracy": 0.9226,
+      "word_ngram_range": [
+        1,
+        2
+      ],
+      "char_ngram_range": [
+        3,
+        5
+      ],
+      "max_features": 200000,
+      "embedding_weight": 1.25,
+      "classifier_c": 1.0,
+      "features": 369393,
+      "train_seconds": 10.879016600025352
+    },
+    {
+      "accuracy": 0.9216,
+      "word_ngram_range": [
+        1,
+        2
+      ],
+      "char_ngram_range": [
+        3,
+        5
+      ],
+      "max_features": 200000,
+      "embedding_weight": 1.25,
+      "classifier_c": 1.1,
+      "features": 369393,
+      "train_seconds": 11.204441699956078
+    },
+    {
+      "accuracy": 0.9214,
+      "word_ngram_range": [
+        1,
+        2
+      ],
+      "char_ngram_range": [
+        3,
+        5
+      ],
+      "max_features": 200000,
+      "embedding_weight": 1.25,
+      "classifier_c": 1.2,
+      "features": 369393,
+      "train_seconds": 12.17655829997966
+    },
+    {
+      "accuracy": 0.9226,
+      "word_ngram_range": [
+        1,
+        2
+      ],
+      "char_ngram_range": [
+        3,
+        5
+      ],
+      "max_features": 200000,
+      "embedding_weight": 1.3,
+      "classifier_c": 0.8,
+      "features": 369393,
+      "train_seconds": 9.585639800003264
+    },
+    {
+      "accuracy": 0.9234,
+      "word_ngram_range": [
+        1,
+        2
+      ],
+      "char_ngram_range": [
+        3,
+        5
+      ],
+      "max_features": 200000,
+      "embedding_weight": 1.3,
+      "classifier_c": 0.9,
+      "features": 369393,
+      "train_seconds": 10.463277600007132
+    },
+    {
+      "accuracy": 0.9224,
+      "word_ngram_range": [
+        1,
+        2
+      ],
+      "char_ngram_range": [
+        3,
+        5
+      ],
+      "max_features": 200000,
+      "embedding_weight": 1.3,
+      "classifier_c": 1.0,
+      "features": 369393,
+      "train_seconds": 11.200477999984287
+    },
+    {
+      "accuracy": 0.9218,
+      "word_ngram_range": [
+        1,
+        2
+      ],
+      "char_ngram_range": [
+        3,
+        5
+      ],
+      "max_features": 200000,
+      "embedding_weight": 1.3,
+      "classifier_c": 1.1,
+      "features": 369393,
+      "train_seconds": 11.583266199973878
+    },
+    {
+      "accuracy": 0.9216,
+      "word_ngram_range": [
+        1,
+        2
+      ],
+      "char_ngram_range": [
+        3,
+        5
+      ],
+      "max_features": 200000,
+      "embedding_weight": 1.3,
+      "classifier_c": 1.2,
+      "features": 369393,
+      "train_seconds": 12.689821499981917
+    },
+    {
+      "accuracy": 0.9226,
+      "word_ngram_range": [
+        1,
+        2
+      ],
+      "char_ngram_range": [
+        3,
+        5
+      ],
+      "max_features": 200000,
+      "embedding_weight": 1.4,
+      "classifier_c": 0.8,
+      "features": 369393,
+      "train_seconds": 10.208803499990609
+    },
+    {
+      "accuracy": 0.9232,
+      "word_ngram_range": [
+        1,
+        2
+      ],
+      "char_ngram_range": [
+        3,
+        5
+      ],
+      "max_features": 200000,
+      "embedding_weight": 1.4,
+      "classifier_c": 0.9,
+      "features": 369393,
+      "train_seconds": 10.79875599994557
+    },
+    {
+      "accuracy": 0.9226,
+      "word_ngram_range": [
+        1,
+        2
+      ],
+      "char_ngram_range": [
+        3,
+        5
+      ],
+      "max_features": 200000,
+      "embedding_weight": 1.4,
+      "classifier_c": 1.0,
+      "features": 369393,
+      "train_seconds": 11.703699000005145
+    },
+    {
+      "accuracy": 0.9218,
+      "word_ngram_range": [
+        1,
+        2
+      ],
+      "char_ngram_range": [
+        3,
+        5
+      ],
+      "max_features": 200000,
+      "embedding_weight": 1.4,
+      "classifier_c": 1.1,
+      "features": 369393,
+      "train_seconds": 12.607924200012349
+    },
+    {
+      "accuracy": 0.9214,
+      "word_ngram_range": [
+        1,
+        2
+      ],
+      "char_ngram_range": [
+        3,
+        5
+      ],
+      "max_features": 200000,
+      "embedding_weight": 1.4,
+      "classifier_c": 1.2,
+      "features": 369393,
+      "train_seconds": 13.753519699967
+    },
+    {
+      "accuracy": 0.9226,
+      "word_ngram_range": [
+        1,
+        2
+      ],
+      "char_ngram_range": [
+        3,
+        5
+      ],
+      "max_features": 200000,
+      "embedding_weight": 1.5,
+      "classifier_c": 0.8,
+      "features": 369393,
+      "train_seconds": 11.386533699987922
+    },
+    {
+      "accuracy": 0.9232,
+      "word_ngram_range": [
+        1,
+        2
+      ],
+      "char_ngram_range": [
+        3,
+        5
+      ],
+      "max_features": 200000,
+      "embedding_weight": 1.5,
+      "classifier_c": 0.9,
+      "features": 369393,
+      "train_seconds": 12.206218699982855
+    },
+    {
+      "accuracy": 0.9224,
+      "word_ngram_range": [
+        1,
+        2
+      ],
+      "char_ngram_range": [
+        3,
+        5
+      ],
+      "max_features": 200000,
+      "embedding_weight": 1.5,
+      "classifier_c": 1.0,
+      "features": 369393,
+      "train_seconds": 12.141181599989068
+    },
+    {
+      "accuracy": 0.922,
+      "word_ngram_range": [
+        1,
+        2
+      ],
+      "char_ngram_range": [
+        3,
+        5
+      ],
+      "max_features": 200000,
+      "embedding_weight": 1.5,
+      "classifier_c": 1.1,
+      "features": 369393,
+      "train_seconds": 12.746078700001817
+    },
+    {
+      "accuracy": 0.9214,
+      "word_ngram_range": [
+        1,
+        2
+      ],
+      "char_ngram_range": [
+        3,
+        5
+      ],
+      "max_features": 200000,
+      "embedding_weight": 1.5,
+      "classifier_c": 1.2,
+      "features": 369393,
+      "train_seconds": 13.99398560001282
+    }
+  ],
+  "output_model": "checkpoints\\himdex_hybrid_ag_news_search_v1.joblib"
+}

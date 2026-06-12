@@ -9,8 +9,10 @@ resume training, or downstream experiments.
   distilled checkpoint.
 - `himdex_ag_news_pure_avg_v1.pt`: previous pure neural AG News averaged
   checkpoint.
+- `himdex_hybrid_ag_news_search_v1.joblib`: current strongest packaged AG News
+  hybrid classifier found by `himdex-search-hybrid`.
 - `himdex_hybrid_ag_news_base_v3_v2.joblib`: current packaged AG News hybrid
-  classifier, tuned with `embedding_weight=1.25` and `classifier_c=1.0`.
+  classifier v2, tuned with `embedding_weight=1.25` and `classifier_c=1.0`.
 - `himdex_hybrid_ag_news_base_v3.joblib`: packaged AG News hybrid classifier
   v1 that combines word/character TF-IDF features with Himdex Base v3
   embeddings.
