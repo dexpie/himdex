@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.15.0 - 2026-06-12
+
+- Added cached teacher-score support to `himdex-distill-text`, avoiding repeat
+  hybrid teacher encoding work across distillation experiments.
+- Added scheduled distillation strength with `--alpha-start` and
+  `--alpha-end`.
+- Added layer-wise learning rates and gradient accumulation to
+  `himdex-distill-text`.
+- Added smoke coverage for the distillation alpha schedule.
+- Added `himdex_ag_news_pure_avg_v3.pt`, a small checkpoint soup between the
+  previous pure best and the searched-teacher distillation run.
+- Improved the pure Himdex AG News validation best from 69.66% to 69.68%.
+
 ## 0.14.0 - 2026-06-12
 
 - Added `himdex-search-hybrid`, a cached grid-search CLI for Himdex Hybrid text

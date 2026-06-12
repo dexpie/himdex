@@ -1,0 +1,26 @@
+{
+  "name": "himdex_ag_news_pure_avg_v3",
+  "checkpoint": "himdex_ag_news_pure_avg_v3.pt",
+  "task": "text-classification",
+  "dataset": "data/himdex_starter/prepared/text_classification/hf_ag_news.csv",
+  "validation_ratio": 0.1,
+  "seed": 42,
+  "validation_accuracy": 0.6968,
+  "validation_loss": 0.7705893386840821,
+  "averaged_from": [
+    {
+      "checkpoint": "checkpoints/himdex_ag_news_pure_avg_v2.pt",
+      "weight": 0.9
+    },
+    {
+      "checkpoint": "runs/himdex_ag_news_distill_search_v1_schedule/himdex.pt",
+      "weight": 0.1
+    }
+  ],
+  "distillation_teacher": "checkpoints/himdex_hybrid_ag_news_search_v1.joblib",
+  "comparison": {
+    "previous_pure_best": 0.6966,
+    "direct_distillation_run": 0.6914,
+    "hybrid_teacher_packaged": 0.9234
+  }
+}

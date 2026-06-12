@@ -1,0 +1,11 @@
+{
+  "checkpoint": "checkpoints\\himdex_ag_news_pure_avg_v3.pt",
+  "data": "data\\himdex_starter\\prepared\\text_classification\\hf_ag_news.csv",
+  "task": "text-classification",
+  "validation_ratio": 0.1,
+  "seed": 42,
+  "validation_samples": 5000,
+  "validation_loss": 0.7705893386840821,
+  "validation_accuracy": 0.6968,
+  "device": "cuda"
+}

@@ -4,7 +4,7 @@ import torch
 
 from himdex.benchmark_tfidf import himdex_split_indices, run_benchmark
 from himdex.checkpoint_tools import average_state_dicts
-from himdex.distill_text import DistillationTextDataset
+from himdex.distill_text import DistillationTextDataset, resolve_alpha
 from himdex.evaluate import evaluate_checkpoint
 from himdex.hybrid_model import predict_texts, train_hybrid_model
 from himdex.search_hybrid import parse_float_list, parse_int_list, parse_ngram_ranges
@@ -180,6 +180,13 @@ def test_distillation_dataset_aligns_teacher_scores(tmp_path):
     item = dataset[0]
     assert item["label"].item() == 0
     assert torch.equal(item["teacher_scores"], teacher_scores[0])
+
+
+def test_distillation_alpha_schedule_interpolates():
+    assert resolve_alpha(1, 3, alpha=0.5, alpha_start=None, alpha_end=None) == 0.5
+    assert resolve_alpha(1, 3, alpha=0.5, alpha_start=0.1, alpha_end=0.3) == 0.1
+    assert resolve_alpha(2, 3, alpha=0.5, alpha_start=0.1, alpha_end=0.3) == 0.2
+    assert resolve_alpha(3, 3, alpha=0.5, alpha_start=0.1, alpha_end=0.3) == 0.3
 
 
 def test_average_state_dicts_blends_float_tensors():

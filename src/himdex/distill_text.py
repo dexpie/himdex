@@ -16,6 +16,7 @@ from .hybrid_model import _require_hybrid_dependencies
 from .inference import HimdexEncoder
 from .model import HimdexConfig, HimdexForTextClassification
 from .tokenizer import ByteTokenizer
+from .train import build_optimizer
 
 
 class DistillationTextDataset(Dataset):
@@ -132,6 +133,66 @@ def hybrid_decision_scores(
     return torch.tensor(scores, dtype=torch.float32), classes
 
 
+def resolve_alpha(epoch: int, epochs: int, alpha: float, alpha_start: float | None, alpha_end: float | None) -> float:
+    if alpha_start is None and alpha_end is None:
+        return alpha
+    start = alpha if alpha_start is None else alpha_start
+    end = start if alpha_end is None else alpha_end
+    if epochs <= 1:
+        return end
+    progress = (epoch - 1) / (epochs - 1)
+    return start + (end - start) * progress
+
+
+def load_or_create_teacher_scores(
+    cache_path: str | Path,
+    teacher_path: str | Path,
+    texts: list[str],
+    checkpoint_path: str | Path | None,
+    batch_size: int,
+    device: str | None,
+    data_path: str | Path,
+    text_column: str,
+    label_column: str,
+) -> tuple[torch.Tensor, list[str]]:
+    joblib, *_ = _require_hybrid_dependencies()
+    cache = Path(cache_path)
+    metadata = {
+        "teacher": str(Path(teacher_path)),
+        "checkpoint": str(Path(checkpoint_path)) if checkpoint_path else None,
+        "data": str(Path(data_path)),
+        "text_column": text_column,
+        "label_column": label_column,
+        "sample_count": len(texts),
+    }
+    if cache.exists():
+        payload = joblib.load(cache)
+        if payload.get("metadata") == metadata:
+            print(f"loaded cached teacher scores {cache}")
+            return payload["scores"].float(), [str(label) for label in payload["classes"]]
+        print(f"teacher cache metadata mismatch; recomputing {cache}")
+
+    scores, classes = hybrid_decision_scores(
+        teacher_path,
+        texts,
+        checkpoint_path,
+        batch_size,
+        device,
+    )
+    cache.parent.mkdir(parents=True, exist_ok=True)
+    joblib.dump(
+        {
+            "format": "himdex-teacher-scores-v1",
+            "metadata": metadata,
+            "classes": classes,
+            "scores": scores.cpu(),
+        },
+        cache,
+    )
+    print(f"saved teacher scores cache {cache}")
+    return scores, classes
+
+
 def run_epoch(
     model: HimdexForTextClassification,
     loader: DataLoader,
@@ -140,7 +201,10 @@ def run_epoch(
     alpha: float,
     optimizer: torch.optim.Optimizer | None = None,
     grad_clip: float = 1.0,
+    grad_accum_steps: int = 1,
 ) -> tuple[float, float]:
+    if grad_accum_steps < 1:
+        raise ValueError("grad_accum_steps must be at least 1")
     training = optimizer is not None
     model.train(training)
     total_loss = 0.0
@@ -149,14 +213,14 @@ def run_epoch(
     scaler = torch.amp.GradScaler("cuda", enabled=training and device.type == "cuda")
 
     progress = tqdm(loader, desc="distill" if training else "validate", leave=False)
-    for batch in progress:
+    if training:
+        optimizer.zero_grad(set_to_none=True)
+    for step, batch in enumerate(progress, start=1):
         input_ids = batch["input_ids"].to(device)
         attention_mask = batch["attention_mask"].to(device)
         labels = batch["label"].to(device)
         teacher_scores = batch["teacher_scores"].to(device)
 
-        if training:
-            optimizer.zero_grad(set_to_none=True)
         with torch.set_grad_enabled(training):
             with torch.autocast(device_type=device.type, enabled=device.type == "cuda"):
                 logits = model(input_ids, attention_mask)
@@ -170,11 +234,17 @@ def run_epoch(
                 ) * (temperature * temperature)
                 loss = (1.0 - alpha) * hard_loss + alpha * soft_loss
             if training:
-                scaler.scale(loss).backward()
-                scaler.unscale_(optimizer)
-                nn.utils.clip_grad_norm_(model.parameters(), grad_clip)
-                scaler.step(optimizer)
-                scaler.update()
+                scaled_loss = loss / grad_accum_steps
+                scaler.scale(scaled_loss).backward()
+                if step % grad_accum_steps == 0 or step == len(loader):
+                    scaler.unscale_(optimizer)
+                    nn.utils.clip_grad_norm_(
+                        (parameter for parameter in model.parameters() if parameter.requires_grad),
+                        grad_clip,
+                    )
+                    scaler.step(optimizer)
+                    scaler.update()
+                    optimizer.zero_grad(set_to_none=True)
 
         batch_size = labels.size(0)
         total_loss += loss.item() * batch_size
@@ -195,12 +265,18 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--epochs", type=int, default=4)
     parser.add_argument("--batch-size", type=int, default=16)
     parser.add_argument("--teacher-batch-size", type=int, default=128)
+    parser.add_argument("--teacher-cache", default="work/himdex_teacher_scores.joblib")
     parser.add_argument("--lr", type=float, default=3e-4)
+    parser.add_argument("--backbone-lr", type=float, default=None)
+    parser.add_argument("--head-lr", type=float, default=None)
     parser.add_argument("--weight-decay", type=float, default=0.05)
     parser.add_argument("--grad-clip", type=float, default=1.0)
+    parser.add_argument("--grad-accum-steps", type=int, default=1)
     parser.add_argument("--validation-ratio", type=float, default=0.1)
     parser.add_argument("--temperature", type=float, default=2.0)
     parser.add_argument("--alpha", type=float, default=0.5)
+    parser.add_argument("--alpha-start", type=float, default=None)
+    parser.add_argument("--alpha-end", type=float, default=None)
     parser.add_argument("--text-pooling", choices=["cls", "mean", "cls-mean"], default="cls-mean")
     parser.add_argument("--text-column", default="text")
     parser.add_argument("--label-column", default="label")
@@ -211,17 +287,23 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> None:
     args = parse_args()
+    if args.grad_accum_steps < 1:
+        raise ValueError("--grad-accum-steps must be at least 1")
     torch.manual_seed(args.seed)
     tokenizer = ByteTokenizer()
     device = torch.device(args.device)
 
     texts, labels = read_texts_and_labels(args.data, args.text_column, args.label_column)
-    teacher_scores, teacher_classes = hybrid_decision_scores(
+    teacher_scores, teacher_classes = load_or_create_teacher_scores(
+        args.teacher_cache,
         args.teacher,
         texts,
         args.backbone_from,
         args.teacher_batch_size,
         args.device,
+        args.data,
+        args.text_column,
+        args.label_column,
     )
     student_checkpoint = (
         torch.load(args.resume_from, map_location="cpu") if args.resume_from else None
@@ -281,11 +363,16 @@ def main() -> None:
     else:
         load_backbone(model, args.backbone_from)
     model.to(device)
-    optimizer = torch.optim.AdamW(
-        model.parameters(), lr=args.lr, weight_decay=args.weight_decay
+    optimizer = build_optimizer(
+        model=model,
+        lr=args.lr,
+        weight_decay=args.weight_decay,
+        backbone_lr=args.backbone_lr,
+        head_lr=args.head_lr,
     )
+    min_learning_rate = min(group["lr"] for group in optimizer.param_groups)
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
-        optimizer, T_max=max(args.epochs, 1), eta_min=args.lr * 0.1
+        optimizer, T_max=max(args.epochs, 1), eta_min=min_learning_rate * 0.1
     )
 
     output_dir = Path(args.output_dir)
@@ -297,26 +384,35 @@ def main() -> None:
     )
 
     for epoch in range(1, args.epochs + 1):
+        current_alpha = resolve_alpha(
+            epoch,
+            args.epochs,
+            args.alpha,
+            args.alpha_start,
+            args.alpha_end,
+        )
         train_loss, train_accuracy = run_epoch(
             model,
             train_loader,
             device,
             args.temperature,
-            args.alpha,
+            current_alpha,
             optimizer,
             args.grad_clip,
+            args.grad_accum_steps,
         )
         validation_loss, validation_accuracy = run_epoch(
             model,
             validation_loader,
             device,
             args.temperature,
-            args.alpha,
+            current_alpha,
         )
         scheduler.step()
         print(
             f"epoch={epoch} train_loss={train_loss:.4f} train_accuracy={train_accuracy:.4f} "
-            f"validation_loss={validation_loss:.4f} validation_accuracy={validation_accuracy:.4f}"
+            f"validation_loss={validation_loss:.4f} validation_accuracy={validation_accuracy:.4f} "
+            f"alpha={current_alpha:.4f}"
         )
         if validation_accuracy > best.validation_accuracy:
             best = DistillationMetrics(
@@ -331,14 +427,20 @@ def main() -> None:
                     "config": config.to_dict(),
                     "label_to_id": label_to_id,
                     "teacher": args.teacher,
+                    "teacher_cache": args.teacher_cache,
                     "resumed_from": args.resume_from or None,
                     "teacher_accuracy": teacher_accuracy,
                     "epoch": epoch,
                     "validation_loss": validation_loss,
                     "validation_accuracy": validation_accuracy,
                     "temperature": args.temperature,
-                    "alpha": args.alpha,
+                    "alpha": current_alpha,
+                    "alpha_start": args.alpha_start,
+                    "alpha_end": args.alpha_end,
                     "learning_rate": optimizer.param_groups[0]["lr"],
+                    "optimizer_lrs": [group["lr"] for group in optimizer.param_groups],
+                    "grad_accum_steps": args.grad_accum_steps,
+                    "effective_batch_size": args.batch_size * args.grad_accum_steps,
                     "model_state": model.state_dict(),
                 },
                 output_dir / "himdex.pt",

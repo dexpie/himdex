@@ -26,7 +26,8 @@ masked-byte prediction steps from Base v2.
 
 | Benchmark | Validation accuracy |
 | --- | ---: |
-| AG News pure Himdex averaged checkpoint | 69.66% |
+| AG News pure Himdex averaged checkpoint v3 | 69.68% |
+| AG News pure Himdex averaged checkpoint v2 | 69.66% |
 | AG News pure Himdex averaged checkpoint v1 | 69.58% |
 | AG News pure Himdex previous best | 69.24% |
 | AG News pure Himdex Base v3 distilled + polished | 67.60% |
@@ -100,14 +101,14 @@ himdex-train --task text-classification --data data\reviews.csv --backbone-from 
 Fine-tune only the task head when you want a fast, low-VRAM local experiment:
 
 ```powershell
-himdex-train --task text-classification --data data\reviews.csv --resume-from checkpoints\himdex_ag_news_pure_avg_v2.pt --freeze-backbone --epochs 1 --batch-size 64
+himdex-train --task text-classification --data data\reviews.csv --resume-from checkpoints\himdex_ag_news_pure_avg_v3.pt --freeze-backbone --epochs 1 --batch-size 64
 ```
 
 Use layer-wise learning rates and gradient accumulation for safer full-model
 polish runs:
 
 ```powershell
-himdex-train --task text-classification --data data\reviews.csv --resume-from checkpoints\himdex_ag_news_pure_avg_v2.pt --backbone-lr 2e-6 --head-lr 2e-5 --grad-accum-steps 2 --batch-size 32
+himdex-train --task text-classification --data data\reviews.csv --resume-from checkpoints\himdex_ag_news_pure_avg_v3.pt --backbone-lr 2e-6 --head-lr 2e-5 --grad-accum-steps 2 --batch-size 32
 ```
 
 Custom columns:
@@ -224,13 +225,13 @@ himdex-hybrid predict --model checkpoints\himdex_hybrid_ag_news_search_v1.joblib
 Evaluate a classification checkpoint on the deterministic Himdex split:
 
 ```powershell
-himdex-evaluate --checkpoint checkpoints\himdex_ag_news_pure_avg_v2.pt --data data\himdex_starter\prepared\text_classification\hf_ag_news.csv --output benchmarks\ag_news_pure_avg_v2_eval.json
+himdex-evaluate --checkpoint checkpoints\himdex_ag_news_pure_avg_v3.pt --data data\himdex_starter\prepared\text_classification\hf_ag_news.csv --output benchmarks\ag_news_pure_avg_v3_eval.json
 ```
 
 Distill the hybrid teacher into a pure neural classifier:
 
 ```powershell
-himdex-distill-text --data data\himdex_pack\prepared\text_classification\hf_ag_news.csv --teacher checkpoints\himdex_hybrid_ag_news_search_v1.joblib --backbone-from checkpoints\himdex_text_base_v3.pt --resume-from runs\himdex_ag_news_pure_cls_mean_continued\himdex.pt
+himdex-distill-text --data data\himdex_pack\prepared\text_classification\hf_ag_news.csv --teacher checkpoints\himdex_hybrid_ag_news_search_v1.joblib --backbone-from checkpoints\himdex_text_base_v3.pt --resume-from checkpoints\himdex_ag_news_pure_avg_v3.pt --teacher-cache work\ag_news_search_v1_teacher_scores.joblib --backbone-lr 5e-6 --head-lr 5e-5 --alpha-start 0.02 --alpha-end 0.06
 ```
 
 Average compatible pure checkpoints:
@@ -239,13 +240,16 @@ Average compatible pure checkpoints:
 himdex-average-checkpoints --first runs\himdex_ag_news_v2_continued\himdex.pt --second runs\himdex_ag_news_v2_best_distill_a01\himdex.pt --second-weight 0.74 --output checkpoints\himdex_ag_news_pure_avg_v2.pt
 ```
 
+The current pure checkpoint v3 was created by averaging v2 with the searched
+teacher distillation run at a 0.10 second-checkpoint weight.
+
 ## Reference Checkpoint
 
 This repository includes a compact reference checkpoint:
 
 ```text
 checkpoints/himdex_text_base_v3.pt
-checkpoints/himdex_ag_news_pure_avg_v2.pt
+checkpoints/himdex_ag_news_pure_avg_v3.pt
 checkpoints/himdex_hybrid_ag_news_search_v1.joblib
 ```
 

@@ -39,19 +39,19 @@ himdex-pretrain-text --data data\himdex_pack\prepared --resume-from checkpoints\
 Evaluate a classification checkpoint:
 
 ```powershell
-himdex-evaluate --checkpoint checkpoints\himdex_ag_news_pure_avg_v2.pt --data data\himdex_starter\prepared\text_classification\hf_ag_news.csv --batch-size 64
+himdex-evaluate --checkpoint checkpoints\himdex_ag_news_pure_avg_v3.pt --data data\himdex_starter\prepared\text_classification\hf_ag_news.csv --batch-size 64
 ```
 
 Run a fast head-only polish pass:
 
 ```powershell
-himdex-train --task text-classification --data data\himdex_starter\prepared\text_classification\hf_ag_news.csv --resume-from checkpoints\himdex_ag_news_pure_avg_v2.pt --freeze-backbone --epochs 1 --batch-size 64 --lr 1e-4
+himdex-train --task text-classification --data data\himdex_starter\prepared\text_classification\hf_ag_news.csv --resume-from checkpoints\himdex_ag_news_pure_avg_v3.pt --freeze-backbone --epochs 1 --batch-size 64 --lr 1e-4
 ```
 
 Run a layer-wise polish pass with a slower backbone learning rate:
 
 ```powershell
-himdex-train --task text-classification --data data\himdex_starter\prepared\text_classification\hf_ag_news.csv --resume-from checkpoints\himdex_ag_news_pure_avg_v2.pt --epochs 1 --batch-size 64 --backbone-lr 2e-6 --head-lr 2e-5 --weight-decay 0.01
+himdex-train --task text-classification --data data\himdex_starter\prepared\text_classification\hf_ag_news.csv --resume-from checkpoints\himdex_ag_news_pure_avg_v3.pt --epochs 1 --batch-size 64 --backbone-lr 2e-6 --head-lr 2e-5 --weight-decay 0.01
 ```
 
 For open-source releases, keep raw datasets out of git. Commit code, configs,
@@ -66,7 +66,8 @@ TF-IDF word+character: 91.90%
 Himdex hybrid searched with Base v3 embeddings: 92.34%
 Himdex hybrid v2 with Base v3 embeddings: 92.26%
 Himdex hybrid v1 with Base v3 embeddings: 92.00%
-Pure Himdex averaged classifier: 69.66%
+Pure Himdex averaged classifier v3: 69.68%
+Pure Himdex averaged classifier v2: 69.66%
 Pure Himdex averaged classifier v1: 69.58%
 Pure Himdex previous best classifier: 69.24%
 Pure Himdex Base v3 distilled + polished classifier: 67.60%
@@ -82,6 +83,12 @@ Latest layer-wise polish test from `himdex_ag_news_pure_avg_v2.pt` used
 `backbone_lr=2e-6` and `head_lr=2e-5`, reaching 69.32% validation accuracy.
 That confirms the released averaged checkpoint remains the stronger pure neural
 artifact for now.
+
+Latest searched-teacher distillation used cached teacher scores,
+`backbone_lr=5e-6`, `head_lr=5e-5`, and an alpha schedule from 0.02 to 0.06.
+The direct distillation checkpoint reached 69.14%, but averaging it into
+`himdex_ag_news_pure_avg_v2.pt` at weight 0.10 produced
+`himdex_ag_news_pure_avg_v3.pt` at 69.68%.
 
 The next pure-neural training target is to reduce this gap with stronger
 pretraining, subword/character-aware text encoders, better pooling, and
