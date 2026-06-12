@@ -96,6 +96,12 @@ trained only 1,540 classifier-head parameters. A stronger head-only run reached
 beat 69.68%, so `himdex_ag_news_pure_avg_v3.pt` remains the released pure
 checkpoint.
 
+Latest error analysis for `himdex_ag_news_pure_avg_v3.pt` shows macro F1 at
+69.37%. Label `2` is the weakest class, with 71.44% precision, 56.08% recall,
+and 62.84% F1. That points the next pure-neural work toward class-conditional
+analysis, targeted data augmentation, and harder negatives for label `2` versus
+labels `3`, `1`, and `0`.
+
 The next pure-neural training target is to reduce this gap with stronger
 pretraining, subword/character-aware text encoders, better pooling, and
 distillation from the hybrid classifier.

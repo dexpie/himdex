@@ -22,6 +22,56 @@ def _validate_label_mapping(dataset_mapping: dict[str, int], checkpoint_mapping:
         )
 
 
+def _classification_report(
+    labels: list[int],
+    predictions: list[int],
+    id_to_label: dict[int, str],
+) -> dict[str, Any]:
+    class_count = len(id_to_label)
+    confusion = [[0 for _ in range(class_count)] for _ in range(class_count)]
+    for label, prediction in zip(labels, predictions):
+        confusion[label][prediction] += 1
+
+    per_class = []
+    f1_scores = []
+    for class_id in range(class_count):
+        true_positive = confusion[class_id][class_id]
+        false_positive = sum(confusion[row][class_id] for row in range(class_count)) - true_positive
+        false_negative = sum(confusion[class_id]) - true_positive
+        support = sum(confusion[class_id])
+        precision = true_positive / max(true_positive + false_positive, 1)
+        recall = true_positive / max(true_positive + false_negative, 1)
+        f1 = 2 * precision * recall / max(precision + recall, 1e-12)
+        f1_scores.append(f1)
+        per_class.append(
+            {
+                "label": id_to_label[class_id],
+                "precision": precision,
+                "recall": recall,
+                "f1": f1,
+                "support": support,
+            }
+        )
+
+    return {
+        "labels": [id_to_label[index] for index in range(class_count)],
+        "confusion_matrix": confusion,
+        "per_class": per_class,
+        "macro_f1": sum(f1_scores) / max(class_count, 1),
+    }
+
+
+def _sample_preview(dataset: Any, index: int, task: str, text_column: str) -> dict[str, Any]:
+    if task == "text-classification":
+        row = dataset.rows[index]
+        text = row[text_column]
+        return {
+            "text": text[:500],
+        }
+    path, _ = dataset.samples[index]
+    return {"path": path}
+
+
 def evaluate_checkpoint(
     checkpoint_path: str | Path,
     data_path: str | Path,
@@ -32,6 +82,9 @@ def evaluate_checkpoint(
     device: str | None = None,
     text_column: str = "text",
     label_column: str = "label",
+    return_predictions: bool = False,
+    prediction_limit: int = 100,
+    include_correct_predictions: bool = False,
 ) -> dict[str, Any]:
     checkpoint = torch.load(checkpoint_path, map_location="cpu")
     resolved_task = task or checkpoint.get("task")
@@ -56,6 +109,7 @@ def evaluate_checkpoint(
         model = HimdexForImageClassification(config, num_labels=len(label_to_id))
 
     _validate_label_mapping(label_to_id, checkpoint_labels)
+    id_to_label = {index: label for label, index in label_to_id.items()}
     model.load_state_dict(checkpoint["model_state"])
 
     validation_size = max(1, int(len(dataset) * validation_ratio))
@@ -73,6 +127,11 @@ def evaluate_checkpoint(
     total_loss = 0.0
     correct = 0
     total = 0
+    all_labels: list[int] = []
+    all_predictions: list[int] = []
+    exported_predictions: list[dict[str, Any]] = []
+    validation_indices = list(validation_dataset.indices)
+    cursor = 0
 
     with torch.no_grad():
         for batch in loader:
@@ -92,11 +151,40 @@ def evaluate_checkpoint(
                 loss = loss_fn(logits, labels)
 
             batch_count = labels.size(0)
+            probabilities = torch.softmax(logits.float(), dim=-1)
+            predictions = logits.argmax(dim=-1)
             total_loss += loss.item() * batch_count
-            correct += (logits.argmax(dim=-1) == labels).sum().item()
+            correct += (predictions == labels).sum().item()
             total += batch_count
+            batch_labels = labels.detach().cpu().tolist()
+            batch_predictions = predictions.detach().cpu().tolist()
+            all_labels.extend(batch_labels)
+            all_predictions.extend(batch_predictions)
 
-    return {
+            if return_predictions and len(exported_predictions) < prediction_limit:
+                confidences = probabilities.max(dim=-1).values.detach().cpu().tolist()
+                for offset, (label_id, prediction_id, confidence) in enumerate(
+                    zip(batch_labels, batch_predictions, confidences)
+                ):
+                    is_correct = label_id == prediction_id
+                    if is_correct and not include_correct_predictions:
+                        continue
+                    dataset_index = validation_indices[cursor + offset]
+                    exported_predictions.append(
+                        {
+                            "dataset_index": dataset_index,
+                            "label": id_to_label[label_id],
+                            "prediction": id_to_label[prediction_id],
+                            "confidence": confidence,
+                            "correct": is_correct,
+                            **_sample_preview(dataset, dataset_index, resolved_task, text_column),
+                        }
+                    )
+                    if len(exported_predictions) >= prediction_limit:
+                        break
+            cursor += batch_count
+
+    metrics = {
         "checkpoint": str(checkpoint_path),
         "data": str(data_path),
         "task": resolved_task,
@@ -107,6 +195,10 @@ def evaluate_checkpoint(
         "validation_accuracy": correct / max(total, 1),
         "device": str(torch_device),
     }
+    metrics.update(_classification_report(all_labels, all_predictions, id_to_label))
+    if return_predictions:
+        metrics["predictions"] = exported_predictions
+    return metrics
 
 
 def parse_args() -> argparse.Namespace:
@@ -121,6 +213,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--text-column", default="text")
     parser.add_argument("--label-column", default="label")
     parser.add_argument("--output", default="")
+    parser.add_argument("--output-predictions", default="")
+    parser.add_argument("--prediction-limit", type=int, default=100)
+    parser.add_argument("--include-correct-predictions", action="store_true")
     return parser.parse_args()
 
 
@@ -136,13 +231,21 @@ def main() -> None:
         device=args.device,
         text_column=args.text_column,
         label_column=args.label_column,
+        return_predictions=bool(args.output_predictions),
+        prediction_limit=args.prediction_limit,
+        include_correct_predictions=args.include_correct_predictions,
     )
+    predictions = metrics.pop("predictions", None)
     payload = json.dumps(metrics, indent=2)
     print(payload)
     if args.output:
         output_path = Path(args.output)
         output_path.parent.mkdir(parents=True, exist_ok=True)
         output_path.write_text(payload + "\n", encoding="utf-8")
+    if args.output_predictions:
+        output_path = Path(args.output_predictions)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(json.dumps(predictions or [], indent=2) + "\n", encoding="utf-8")
 
 
 if __name__ == "__main__":

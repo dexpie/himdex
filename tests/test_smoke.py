@@ -274,10 +274,17 @@ def test_evaluate_checkpoint_runs_on_toy_text_data(tmp_path):
         batch_size=2,
         validation_ratio=0.5,
         device="cpu",
+        return_predictions=True,
+        prediction_limit=2,
     )
 
     assert metrics["validation_samples"] == 2
     assert 0.0 <= metrics["validation_accuracy"] <= 1.0
+    assert metrics["labels"] == ["space", "sports"]
+    assert len(metrics["confusion_matrix"]) == 2
+    assert len(metrics["per_class"]) == 2
+    assert "macro_f1" in metrics
+    assert "predictions" in metrics
 
 
 def test_freeze_backbone_parameters_keeps_head_trainable():

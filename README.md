@@ -228,6 +228,13 @@ Evaluate a classification checkpoint on the deterministic Himdex split:
 himdex-evaluate --checkpoint checkpoints\himdex_ag_news_pure_avg_v3.pt --data data\himdex_starter\prepared\text_classification\hf_ag_news.csv --output benchmarks\ag_news_pure_avg_v3_eval.json
 ```
 
+Export a richer report with confusion matrix, per-class metrics, and a local
+error sample for debugging:
+
+```powershell
+himdex-evaluate --checkpoint checkpoints\himdex_ag_news_pure_avg_v3.pt --data data\himdex_starter\prepared\text_classification\hf_ag_news.csv --output benchmarks\ag_news_pure_avg_v3_report.json --output-predictions work\ag_news_pure_avg_v3_errors.json --prediction-limit 50
+```
+
 Distill the hybrid teacher into a pure neural classifier:
 
 ```powershell

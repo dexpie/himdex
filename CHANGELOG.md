@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.17.0 - 2026-06-12
+
+- Expanded `himdex-evaluate` with confusion matrices, per-class
+  precision/recall/F1, macro F1, and optional prediction export.
+- Added smoke coverage for the richer evaluation report fields.
+- Added an AG News pure v3 evaluation report with per-class metrics.
+- Identified the current pure checkpoint's weakest AG News class: label `2`
+  has 56.08% recall on the deterministic validation split.
+
 ## 0.16.0 - 2026-06-12
 
 - Added `--freeze-backbone` to `himdex-distill-text` for low-VRAM,

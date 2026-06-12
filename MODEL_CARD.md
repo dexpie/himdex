@@ -49,6 +49,9 @@ Classification checkpoints can be re-evaluated with `himdex-evaluate`.
 | Text classification, Base v3 continued | AG News | 10% | 65.08% | 0.8646 |
 | Image classification | Beans | 15% | 78.71% | 0.5591 |
 
+The pure averaged Himdex v3 AG News report has macro F1 of 69.37%. Its weakest
+class is label `2`, with 56.08% recall and 62.84% F1.
+
 ## Text Baseline Benchmarks
 
 All AG News text benchmarks below use the same deterministic 45,000/5,000
