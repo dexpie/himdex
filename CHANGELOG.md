@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.13.0 - 2026-06-12
+
+- Tuned the packaged AG News Himdex Hybrid model by lowering the LinearSVC
+  regularization strength to `C=1.0` and raising the embedding weight to `1.25`.
+- Added `--classifier-c` to `himdex-hybrid train` and
+  `himdex-benchmark-hybrid`.
+- Added the packaged `himdex_hybrid_ag_news_base_v3_v2.joblib` artifact.
+- Improved the strongest packaged AG News artifact from 92.00% to 92.26%
+  validation accuracy on the deterministic Himdex split.
+
 ## 0.12.0 - 2026-06-12
 
 - Added `--backbone-lr` and `--head-lr` to `himdex-train` for layer-wise

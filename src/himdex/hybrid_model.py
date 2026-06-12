@@ -36,7 +36,8 @@ def train_hybrid_model(
     validation_ratio: float = 0.1,
     seed: int = 42,
     max_features: int = 200_000,
-    embedding_weight: float = 1.0,
+    embedding_weight: float = 1.25,
+    classifier_c: float = 1.0,
     batch_size: int = 128,
     text_column: str = "text",
     label_column: str = "label",
@@ -66,7 +67,7 @@ def train_hybrid_model(
     train_features = hstack([train_tfidf, csr_matrix(train_embeddings)], format="csr")
     validation_features = hstack([validation_tfidf, csr_matrix(validation_embeddings)], format="csr")
 
-    classifier = LinearSVC(C=2.0)
+    classifier = LinearSVC(C=classifier_c)
     classifier.fit(train_features, train_labels)
     predictions = classifier.predict(validation_features)
 
@@ -76,6 +77,7 @@ def train_hybrid_model(
         "tfidf": tfidf,
         "classifier": classifier,
         "embedding_weight": embedding_weight,
+        "classifier_c": classifier_c,
         "max_features_per_vectorizer": max_features,
         "validation_ratio": validation_ratio,
         "seed": seed,
@@ -128,7 +130,8 @@ def parse_args() -> argparse.Namespace:
     train.add_argument("--validation-ratio", type=float, default=0.1)
     train.add_argument("--seed", type=int, default=42)
     train.add_argument("--max-features", type=int, default=200_000)
-    train.add_argument("--embedding-weight", type=float, default=1.0)
+    train.add_argument("--embedding-weight", type=float, default=1.25)
+    train.add_argument("--classifier-c", type=float, default=1.0)
     train.add_argument("--batch-size", type=int, default=128)
     train.add_argument("--text-column", default="text")
     train.add_argument("--label-column", default="label")
@@ -154,6 +157,7 @@ def main() -> None:
             seed=args.seed,
             max_features=args.max_features,
             embedding_weight=args.embedding_weight,
+            classifier_c=args.classifier_c,
             batch_size=args.batch_size,
             text_column=args.text_column,
             label_column=args.label_column,

@@ -63,7 +63,8 @@ The current AG News target to beat is the word+character TF-IDF baseline:
 
 ```text
 TF-IDF word+character: 91.90%
-Himdex hybrid with Base v3 embeddings: 92.00%
+Himdex hybrid v2 with Base v3 embeddings: 92.26%
+Himdex hybrid v1 with Base v3 embeddings: 92.00%
 Pure Himdex averaged classifier: 69.66%
 Pure Himdex averaged classifier v1: 69.58%
 Pure Himdex previous best classifier: 69.24%

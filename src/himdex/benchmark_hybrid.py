@@ -24,6 +24,7 @@ class HybridResult:
     features: int
     max_features_per_vectorizer: int
     embedding_weight: float
+    classifier_c: float
     validation_ratio: float
     seed: int
     train_samples: int
@@ -36,7 +37,8 @@ def run_hybrid_benchmark(
     validation_ratio: float = 0.1,
     seed: int = 42,
     max_features: int = 200_000,
-    embedding_weight: float = 1.0,
+    embedding_weight: float = 1.25,
+    classifier_c: float = 1.0,
     batch_size: int = 128,
     text_column: str = "text",
     label_column: str = "label",
@@ -73,7 +75,7 @@ def run_hybrid_benchmark(
     train_features = hstack([train_tfidf, csr_matrix(train_embeddings)], format="csr")
     validation_features = hstack([validation_tfidf, csr_matrix(validation_embeddings)], format="csr")
 
-    classifier = LinearSVC(C=2.0)
+    classifier = LinearSVC(C=classifier_c)
     started = time.perf_counter()
     classifier.fit(train_features, train_labels)
     train_seconds = time.perf_counter() - started
@@ -93,6 +95,7 @@ def run_hybrid_benchmark(
         features=train_features.shape[1],
         max_features_per_vectorizer=max_features,
         embedding_weight=embedding_weight,
+        classifier_c=classifier_c,
         validation_ratio=validation_ratio,
         seed=seed,
         train_samples=len(train_indices),
@@ -107,7 +110,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--validation-ratio", type=float, default=0.1)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--max-features", type=int, default=200_000)
-    parser.add_argument("--embedding-weight", type=float, default=1.0)
+    parser.add_argument("--embedding-weight", type=float, default=1.25)
+    parser.add_argument("--classifier-c", type=float, default=1.0)
     parser.add_argument("--batch-size", type=int, default=128)
     parser.add_argument("--text-column", default="text")
     parser.add_argument("--label-column", default="label")
@@ -125,6 +129,7 @@ def main() -> None:
         seed=args.seed,
         max_features=args.max_features,
         embedding_weight=args.embedding_weight,
+        classifier_c=args.classifier_c,
         batch_size=args.batch_size,
         text_column=args.text_column,
         label_column=args.label_column,
