@@ -33,6 +33,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--hidden-size", type=int, default=256)
     parser.add_argument("--num-layers", type=int, default=4)
     parser.add_argument("--num-heads", type=int, default=4)
+    parser.add_argument("--text-pooling", choices=["cls", "mean", "cls-mean"], default="cls")
     parser.add_argument("--text-column", default="text")
     parser.add_argument("--label-column", default="label")
     parser.add_argument("--seed", type=int, default=42)
@@ -128,6 +129,8 @@ def main() -> None:
             num_layers=args.num_layers,
             num_heads=args.num_heads,
         )
+    if args.task == "text-classification" and not args.resume_from:
+        config.text_pooling = args.text_pooling
 
     if args.task == "text-classification":
         dataset = CSVTextDataset(

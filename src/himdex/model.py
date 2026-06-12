@@ -17,6 +17,7 @@ class HimdexConfig:
     num_heads: int = 4
     mlp_ratio: int = 4
     dropout: float = 0.1
+    text_pooling: str = "cls"
 
     def to_dict(self) -> dict:
         return asdict(self)
@@ -134,12 +135,43 @@ class HimdexBackbone(nn.Module):
 class HimdexForTextClassification(nn.Module):
     def __init__(self, config: HimdexConfig, num_labels: int) -> None:
         super().__init__()
+        if config.text_pooling not in {"cls", "mean", "cls-mean"}:
+            raise ValueError(f"Unsupported text_pooling: {config.text_pooling}")
         self.backbone = HimdexBackbone(config)
-        self.classifier = nn.Linear(config.hidden_size, num_labels)
+        self.config = config
+        classifier_input = (
+            config.hidden_size * 2
+            if config.text_pooling == "cls-mean"
+            else config.hidden_size
+        )
+        if config.text_pooling == "cls":
+            self.classifier = nn.Linear(classifier_input, num_labels)
+        else:
+            self.classifier = nn.Sequential(
+                nn.LayerNorm(classifier_input),
+                nn.Linear(classifier_input, config.hidden_size),
+                nn.GELU(),
+                nn.Dropout(config.dropout),
+                nn.Linear(config.hidden_size, num_labels),
+            )
 
     def forward(self, input_ids: torch.Tensor, attention_mask: torch.Tensor) -> torch.Tensor:
         encoded = self.backbone.forward_text(input_ids, attention_mask)
-        return self.classifier(encoded[:, 0])
+        if self.config.text_pooling == "cls":
+            pooled = encoded[:, 0]
+        else:
+            mask = attention_mask.bool()
+            mask[:, 0] = False
+            token_mask = mask.unsqueeze(-1)
+            token_sum = (encoded * token_mask).sum(dim=1)
+            token_count = token_mask.sum(dim=1).clamp_min(1)
+            mean_pooled = token_sum / token_count
+            pooled = (
+                torch.cat([encoded[:, 0], mean_pooled], dim=-1)
+                if self.config.text_pooling == "cls-mean"
+                else mean_pooled
+            )
+        return self.classifier(pooled)
 
 
 class HimdexForMaskedTextModeling(nn.Module):

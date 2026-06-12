@@ -30,6 +30,7 @@ Results:
 | TF-IDF word + character | 91.90% |
 | TF-IDF word + character + Himdex Base v2 embedding | 91.94% |
 | TF-IDF word + character + Himdex Base v3 embedding | 92.00% |
+| Himdex Base v3 cls-mean classifier | 66.98% |
 | Himdex Base v3 classifier continued | 65.08% |
 
 Reproduce:

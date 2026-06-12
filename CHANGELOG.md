@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.6.0 - 2026-06-12
+
+- Added pure neural text pooling modes for `himdex-train`: `cls`, `mean`, and
+  `cls-mean`.
+- Added a stronger MLP classifier head for mean-based text pooling.
+- Recorded the AG News pure `cls-mean` experiment, which improved the Base v3
+  pure classifier path to 66.98% validation accuracy while still trailing the
+  69.24% pure Himdex best.
+
 ## 0.5.0 - 2026-06-12
 
 - Added `himdex-hybrid`, a train/predict CLI for persisted Himdex hybrid text

@@ -27,6 +27,7 @@ masked-byte prediction steps from Base v2.
 | Benchmark | Validation accuracy |
 | --- | ---: |
 | AG News pure Himdex best | 69.24% |
+| AG News pure Himdex Base v3 cls-mean | 66.98% |
 | AG News pure Himdex Base v3 continued | 65.08% |
 | AG News TF-IDF word+char baseline | 91.90% |
 | AG News Himdex Hybrid packaged model | 92.00% |
@@ -83,6 +84,12 @@ Train:
 
 ```powershell
 himdex-train --task text-classification --data data\reviews.csv --epochs 5 --batch-size 16
+```
+
+Use a stronger pure neural pooling head:
+
+```powershell
+himdex-train --task text-classification --data data\reviews.csv --backbone-from checkpoints\himdex_text_base_v3.pt --text-pooling cls-mean
 ```
 
 Custom columns:
@@ -207,6 +214,7 @@ resume training, or build downstream experiments.
 Himdex is designed to grow through focused, measurable improvements:
 
 - stronger text pretraining objectives;
+- pure text distillation from the packaged Himdex Hybrid model;
 - hybrid neural/sparse text models;
 - subword and character-aware text encoders;
 - masked image modeling and contrastive visual learning;

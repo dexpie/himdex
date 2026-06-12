@@ -1,0 +1,17 @@
+{
+  "name": "Himdex Base v3 pure cls-mean classifier",
+  "dataset": "data\\himdex_starter\\prepared\\text_classification\\hf_ag_news.csv",
+  "base_checkpoint": "checkpoints\\himdex_text_base_v3.pt",
+  "validation_ratio": 0.1,
+  "seed": 42,
+  "text_pooling": "cls-mean",
+  "initial_epochs": 4,
+  "continued_epochs": 4,
+  "best_validation_accuracy": 0.6698,
+  "best_validation_loss": 0.8305,
+  "comparison": {
+    "base_v3_pure_continued": 0.6508,
+    "best_pure_himdex": 0.6924,
+    "himdex_hybrid_base_v3": 0.92
+  }
+}

@@ -26,6 +26,23 @@ def test_text_forward_shape():
     assert logits.shape == (1, 3)
 
 
+def test_text_cls_mean_pooling_forward_shape():
+    tokenizer = ByteTokenizer()
+    config = HimdexConfig(
+        max_text_length=32,
+        hidden_size=64,
+        num_layers=1,
+        num_heads=4,
+        text_pooling="cls-mean",
+    )
+    model = HimdexForTextClassification(config, num_labels=3)
+    encoded = tokenizer.encode("halo himdex pooling", max_length=32)
+
+    logits = model(encoded.input_ids.unsqueeze(0), encoded.attention_mask.unsqueeze(0))
+
+    assert logits.shape == (1, 3)
+
+
 def test_image_forward_shape():
     config = HimdexConfig(image_size=32, patch_size=8, hidden_size=64, num_layers=1, num_heads=4)
     model = HimdexForImageClassification(config, num_labels=5)

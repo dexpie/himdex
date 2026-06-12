@@ -47,9 +47,10 @@ The current AG News target to beat is the word+character TF-IDF baseline:
 TF-IDF word+character: 91.90%
 Himdex hybrid with Base v3 embeddings: 92.00%
 Pure Himdex best classifier: 69.24%
+Pure Himdex Base v3 cls-mean classifier: 66.98%
 Pure Himdex Base v3 continued classifier: 65.08%
 ```
 
 The next pure-neural training target is to reduce this gap with stronger
-pretraining, subword/character-aware text encoders, and distillation from the
-hybrid classifier.
+pretraining, subword/character-aware text encoders, better pooling, and
+distillation from the hybrid classifier.
